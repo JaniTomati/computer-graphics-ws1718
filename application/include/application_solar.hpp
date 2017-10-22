@@ -17,6 +17,10 @@ class ApplicationSolar : public Application {
   void uploadUniforms();
   // update projection matrix
   void updateProjection();
+  // calculate model matrix
+  glm::fmat4 createPlanetModelMatrix(glm::fmat4 model_matrix, planet const& planet_instance) const;
+  // caculate and upload the model- and normal matrix
+  void uploadPlanetTransforms(planet const& planet_instance) const;
   // react to key input
   void keyCallback(int key, int scancode, int action, int mods);
   //handle delta mouse movement input
@@ -26,12 +30,14 @@ class ApplicationSolar : public Application {
   void render() const;
 
  protected:
+  void initializePlanets();
   void initializeShaderPrograms();
   void initializeGeometry();
   void updateView();
 
   // cpu representation of model
   model_object planet_object;
+  std::vector<planet> m_planet_list;
 };
 
 #endif

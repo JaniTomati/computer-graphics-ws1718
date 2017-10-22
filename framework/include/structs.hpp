@@ -3,8 +3,16 @@
 
 #include <map>
 #include <glbinding/gl/gl.h>
-// use gl definitions from glbinding 
+#include <string>
+// use gl definitions from glbinding
 using namespace gl;
+
+// planet type enum
+typedef enum {
+  _moon,
+  _sun,
+  _planet
+} Planet_Type;
 
 // gpu representation of model
 struct model_object {
@@ -37,11 +45,29 @@ struct shader_program {
    {}
 
   // path to shader source
-  std::string vertex_path; 
-  std::string fragment_path; 
+  std::string vertex_path;
+  std::string fragment_path;
   // object handle
   GLuint handle;
   // uniform locations mapped to name
   std::map<std::string, GLint> u_locs{};
+};
+
+struct planet {
+  planet(std::string const& name, float size, float rotation_speed,
+        float distance_to_origin, std::string const& orbit_origin, Planet_Type const& type) :
+    m_name {name},
+    m_size {float(size * 0.01f)},
+    m_rotation_speed {float(rotation_speed * 0.001f)},
+    m_distance_to_origin {float(distance_to_origin * 0.01f)},
+    m_orbit_origin {orbit_origin},
+    m_planet_type {type} {}
+
+  std::string m_name;
+  float m_size;
+  float m_rotation_speed;
+  float m_distance_to_origin;
+  std::string m_orbit_origin; // orbit planet
+  Planet_Type m_planet_type;  // type of planet (_moon, _sun, _planet)
 };
 #endif

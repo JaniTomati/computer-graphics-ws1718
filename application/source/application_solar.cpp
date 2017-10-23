@@ -95,7 +95,8 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         // upload model matrix
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
-      }
+	break;
+      } 
     }
   } else {
     // transform planet (where orbit planet is sun)
@@ -119,11 +120,11 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
     updateView();
   }
-  else if ((key == GLFW_KEY_A || key == GLFW_KEY_LEFT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
+  else if ((key == GLFW_KEY_A || key == GLFW_KEY_LEFT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
     updateView();
   }
-  else if ((key == GLFW_KEY_D || key == GLFW_KEY_RIGHT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
+  else if ((key == GLFW_KEY_D || key == GLFW_KEY_RIGHT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.1f, 0.0f, 0.0f});
     updateView();
   }
@@ -140,14 +141,14 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
   // mouse handling
-  m_view_transform = glm::rotate(m_view_transform, 0.025f, glm::fvec3{pos_x, pos_y, 0.0f});
+  m_view_transform = glm::rotate(m_view_transform, -0.025f, glm::fvec3{pos_x, pos_y, 0.0f});
   updateView();
 }
 
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
-  planet sun {"sun", 139.278f, 0.0f, 0.0f, "sun", _sun};
+  planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun};
   planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet};
   planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet};
   planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet};
@@ -157,7 +158,7 @@ void ApplicationSolar::initializePlanets() {
   planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet};
   planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet};
   planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet};
-  planet moon {"moon", 3.475f, 27.3f, 38.40f, "earth", _moon};
+  planet moon {"moon", 3.475f, 27.3f*100, 38.40f, "earth", _moon};
 
   // insert planets
   m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,

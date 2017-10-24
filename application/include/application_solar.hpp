@@ -37,6 +37,7 @@ class ApplicationSolar : public Application {
 
   // cpu representation of model
   model_object planet_object;
+  // a vector that saves all the planets that are to be rendered in the program
   std::vector<planet> m_planet_list;
 };
 

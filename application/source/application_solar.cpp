@@ -70,7 +70,7 @@ void ApplicationSolar::uploadUniforms() {
 }
 
 // calculate a planets model matrix
-glm::fmat4 ApplicationSolar::createPlanetModelMatrix(glm::fmat4 model_matrix, planet const& planet_instance) const {
+glm::fmat4 ApplicationSolar::calculatePlanetModelMatrix(glm::fmat4 model_matrix, planet const& planet_instance) const {
   model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * planet_instance.m_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
   model_matrix = glm::translate(model_matrix, glm::fvec3 {0.0f, 0.0f, -1.0f * planet_instance.m_distance_to_origin});
   model_matrix = glm::scale(model_matrix, glm::fvec3 {planet_instance.m_size, planet_instance.m_size, planet_instance.m_size});
@@ -83,6 +83,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
   glm::fmat4 model_matrix;
   // planet transforms for _moon planets
   if (planet_instance.m_planet_type == _moon) {
+    // find the planet which is orbited by the given moon
     for (auto const& orbit : m_planet_list) {
       if (orbit.m_name == planet_instance.m_orbit_origin) {
         // transform orbit planet
@@ -90,17 +91,17 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         model_matrix = glm::translate(model_matrix, glm::fvec3 {0.0f, 0.0f, -1.0f * orbit.m_distance_to_origin});
 
         // transform moon planet
-        model_matrix = createPlanetModelMatrix(model_matrix, planet_instance);
+        model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
 
         // upload model matrix
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
-	break;
-      } 
+        break;
+      }
     }
   } else {
     // transform planet (where orbit planet is sun)
-    model_matrix = createPlanetModelMatrix(model_matrix, planet_instance);
+    model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
   }
@@ -112,33 +113,39 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
 
 // handle key input
 void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) {
+  // move forwards
   if ((key == GLFW_KEY_W || key == GLFW_KEY_UP) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
     updateView();
   }
+  // move backwards
   else if ((key == GLFW_KEY_S || key == GLFW_KEY_DOWN) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
     updateView();
   }
+  // move to the left
   else if ((key == GLFW_KEY_A || key == GLFW_KEY_LEFT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
     updateView();
   }
+  // move to the right
   else if ((key == GLFW_KEY_D || key == GLFW_KEY_RIGHT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.1f, 0.0f, 0.0f});
     updateView();
   }
+  // move upwards
   else if (key == GLFW_KEY_SPACE && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.1f, 0.0f});
     updateView();
   }
+  // move downwards
   else if (key == GLFW_KEY_C && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, -0.1f, 0.0f});
     updateView();
   }
 }
 
-//handle delta mouse movement input
+// handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
   // mouse handling
   m_view_transform = glm::rotate(m_view_transform, -0.025f, glm::fvec3{pos_x, pos_y, 0.0f});
@@ -158,7 +165,7 @@ void ApplicationSolar::initializePlanets() {
   planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet};
   planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet};
   planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet};
-  planet moon {"moon", 3.475f, 27.3f*100, 38.40f, "earth", _moon};
+  planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon};
 
   // insert planets
   m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,

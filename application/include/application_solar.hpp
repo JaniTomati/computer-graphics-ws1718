@@ -41,9 +41,9 @@ class ApplicationSolar : public Application {
   // a vector that saves all the planets that are to be rendered in the program
   std::vector<planet> m_planet_list;
 
+  model_object star_object;
 
   std::vector<GLfloat> m_star_list;
-  model_object star_object;
 };
 
 #endif

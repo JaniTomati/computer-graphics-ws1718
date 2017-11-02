@@ -24,7 +24,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,planet_object{}
  ,star_object{}
 {
-  initializeStars(1000);
+  initializeStars(100000);
   initializePlanets();
   initializeShaderPrograms();
   initializeGeometry();
@@ -32,9 +32,14 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 
 void ApplicationSolar::render() const {
 
+  // render Stars
+  glBindVertexArray(star_object.vertex_AO);
+  glUseProgram(m_shaders.at("star").handle);
+  // glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
+  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements); //Not sure here
+
   // bind shader to upload uniforms
   glUseProgram(m_shaders.at("planet").handle);
-
   // iterate planet vector and create planet transforms for each planet
   for (auto const& planet : m_planet_list) {
     uploadPlanetTransforms(planet);
@@ -45,13 +50,7 @@ void ApplicationSolar::render() const {
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
   }
-
-  //render Stars
-  glBindVertexArray(star_object.vertex_AO);
-  glUseProgram(m_shaders.at("star").handle);
-  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements); //Not sure here
-
-
+  glBindVertexArray(0);
 }
 
 void ApplicationSolar::updateView() {
@@ -188,8 +187,8 @@ void ApplicationSolar::initializePlanets() {
   planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon};
 
   // insert planets
-  //m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,
-  //                     jupiter, saturn, uranus, neptune, pluto, moon});
+  m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,
+                       jupiter, saturn, uranus, neptune, pluto, moon});
 }
 
 // load shader programs
@@ -214,12 +213,12 @@ void ApplicationSolar::initializeShaderPrograms() {
 
 void ApplicationSolar::initializeStars(unsigned int number_stars) {
   for (unsigned int i = 0; i < number_stars; ++i) {
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 100 + 1));
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 100 + 1));
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 100 + 1));
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 100 + 1));
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 100 + 1));
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 100 + 1));
+    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
+    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
+    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
+    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
+    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
+    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
   }
 }
 
@@ -227,7 +226,7 @@ void ApplicationSolar::initializeStars(unsigned int number_stars) {
 void ApplicationSolar::initializeGeometry() {
   model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
 
-  model star_model = model(m_star_list, model::POSITION + model::NORMAL, {});
+  model star_model = model{m_star_list, (model::POSITION + model::NORMAL), {1}};
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -289,7 +288,9 @@ void ApplicationSolar::initializeGeometry() {
 
   star_object.draw_mode = GL_POINTS;
 
-  star_object.num_elements = GLsizei(star_model.indices.size() / 6);
+  star_object.num_elements = GLsizei(star_model.data.size() / 6);
+
+  glBindVertexArray(0);
 
 }
 

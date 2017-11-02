@@ -19,6 +19,9 @@ class ApplicationSolar : public Application {
   void updateProjection();
   // calculate model matrix
   glm::fmat4 calculatePlanetModelMatrix(glm::fmat4 model_matrix, planet const& planet_instance) const;
+
+  // void calculateOrbit(glm::fmat4 model_matrix, glm::vec3 planet_distance);
+
   // caculate and upload the model- and normal matrix
   void uploadPlanetTransforms(planet const& planet_instance) const;
   // react to key input

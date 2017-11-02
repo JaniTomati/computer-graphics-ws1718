@@ -184,6 +184,20 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 }
 
+void ApplicationSolar::initializeStars() {
+  int number_stars = 1;
+  for (int i = 0; i < number_stars; ++i) {
+    GLfloat x = 0;
+    GLfloat y = 0;
+    GLfloat z = 0;
+
+    GLfloat r = static_cast<GLfloat> (rand()) / static_cast<GLfloat> (RAND_MAX);
+    GLfloat g = 0;
+    GLfloat b = 0;
+    m_star_list.push_back(r);
+  }
+}
+
 // load models
 void ApplicationSolar::initializeGeometry() {
   model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);

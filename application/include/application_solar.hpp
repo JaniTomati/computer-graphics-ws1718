@@ -30,6 +30,7 @@ class ApplicationSolar : public Application {
   void render() const;
 
  protected:
+  void initializeStars();
   void initializePlanets();
   void initializeShaderPrograms();
   void initializeGeometry();
@@ -39,6 +40,7 @@ class ApplicationSolar : public Application {
   model_object planet_object;
   // a vector that saves all the planets that are to be rendered in the program
   std::vector<planet> m_planet_list;
+  std::vector<GLfloat> m_star_list;
 };
 
 #endif

@@ -30,6 +30,7 @@ class ApplicationSolar : public Application {
   void render() const;
 
  protected:
+  void initializeOrbit();
   void initializeStars(unsigned int );
   void initializePlanets();
   void initializeShaderPrograms();
@@ -44,6 +45,10 @@ class ApplicationSolar : public Application {
   model_object star_object;
 
   std::vector<GLfloat> m_star_list;
+
+ model_object orbit_object;
+
+ std::vector<GLfloat> m_orbit_list;
 };
 
 #endif

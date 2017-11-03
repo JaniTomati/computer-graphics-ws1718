@@ -18,16 +18,20 @@ using namespace gl;
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <cmath>
 
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
  ,star_object{}
-,orbit_object{}
+ ,orbit_object{}
+ ,m_planet_list{}
+ ,m_star_list{}
+ ,m_orbit_list{}
 {
-  initializeOrbit();
-  initializeStars(100000);
   initializePlanets();
+  initializeStars(100000);
+  initializeOrbit();
   initializeShaderPrograms();
   initializeGeometry();
 }
@@ -44,17 +48,17 @@ void ApplicationSolar::render() const {
   glUseProgram(m_shaders.at("planet").handle);
   // iterate planet vector and create planet transforms for each planet
   for (auto const& planet : m_planet_list) {
-    uploadPlanetTransforms(planet);
+    calculateOrbit(planet.m_distance_to_origin);
+    glBindVertexArray(orbit_object.vertex_AO);
+    //glUseProgram(m_shaders.at("orbit").handle);
+    glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
+
+    uploadPlanetTransforms(planet);
     // bind the VAO to draw
     glBindVertexArray(planet_object.vertex_AO);
-
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-
-    glBindVertexArray(orbit_object.vertex_AO);
-    glUseProgram(m_shaders.at("orbit").handle);
-    glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
   }
   glBindVertexArray(0);
 }
@@ -97,9 +101,9 @@ void ApplicationSolar::uploadUniforms() {
   updateUniformLocations();
 
   // bind new shader
-  glUseProgram(m_shaders.at("planet").handle);
-  glUseProgram(m_shaders.at("star").handle);
-  glUseProgram(m_shaders.at("orbit").handle);
+  // glUseProgram(m_shaders.at("planet").handle);
+  // glUseProgram(m_shaders.at("star").handle);
+  // glUseProgram(m_shaders.at("orbit").handle);
 
   updateView();
   updateProjection();
@@ -113,18 +117,18 @@ glm::fmat4 ApplicationSolar::calculatePlanetModelMatrix(glm::fmat4 model_matrix,
   return model_matrix;
 }
 
-// void ApplicationSolar::calculateOrbit(glm::fmat4 model_matrix, glm::vec3 planet_distance) {
-//   model_matrix = glm::scale(glm::fmat4{}, planet_distance);
-//   glUseProgram(m_shaders.at("orbit").handle);
-//   glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
-//                      1, GL_FALSE, glm::value_ptr(model_matrix));
-// }
+void ApplicationSolar::calculateOrbit(float planet_distance) const {
+  glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3 {planet_distance, planet_distance, planet_distance});
+  glUseProgram(m_shaders.at("orbit").handle);
+  glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
+                    1, GL_FALSE, glm::value_ptr(model_matrix));
+}
 
 // caculate and upload the model- and normal matrix
 void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) const {
   // create model matrix for our given planet
   glm::fmat4 model_matrix;
-  glm::vec3 planet_distance;
+  glm::fmat4 orbit_matrix;
   // planet transforms for _moon planets
   if (planet_instance.m_planet_type == _moon) {
     // find the planet which is orbited by the given moon
@@ -141,10 +145,6 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         glUseProgram(m_shaders.at("planet").handle);
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
-
-        // planet_distance = {planet_instance.m_size, planet_instance.m_size, planet_instance.m_size};
-        // calculateOrbit(model_matrix, planet_distance);
-
         break;
       }
     }
@@ -154,15 +154,12 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     glUseProgram(m_shaders.at("planet").handle);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
-    // planet_distance = {planet_instance.m_size, planet_instance.m_size, planet_instance.m_size};
   }
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   glUseProgram(m_shaders.at("planet").handle);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                      1, GL_FALSE, glm::value_ptr(normal_matrix));
-
-  // calculateOrbit(model_matrix, planet_distance);
 }
 
 // handle key input
@@ -265,10 +262,19 @@ void ApplicationSolar::initializeStars(unsigned int number_stars) {
 }
 
 void ApplicationSolar::initializeOrbit() {
-  for (int i = 0; i < 359; ++i) {
+  for (unsigned int i = 0; i < 359; ++i) {
     m_orbit_list.push_back(static_cast<GLfloat> (cos((i * M_PI))/180));
     m_orbit_list.push_back(static_cast<GLfloat> (0.0f));
     m_orbit_list.push_back(static_cast<GLfloat> (-sin((i * M_PI))/180));
+  }
+
+  // m_orbit_list.push_back(1.0f);
+  // m_orbit_list.push_back(0.0f);
+  // m_orbit_list.push_back(-0.0f);
+
+  for(int i = 0; i < m_orbit_list.size(); ++i) {
+    std::cout << m_orbit_list[i] << std::endl;
+    std::cout << i << " so viele schöne iiiiis" << std::endl;
   }
 }
 
@@ -278,7 +284,7 @@ void ApplicationSolar::initializeGeometry() {
 
   model star_model = model{m_star_list, (model::POSITION + model::NORMAL), {1}};
 
-  model orbit_model = model{m_orbit_list, (model::POSITION + model::NORMAL), {1}};
+  model orbit_model = model{m_orbit_list, (model::POSITION), {1}};
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);

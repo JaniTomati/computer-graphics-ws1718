@@ -20,7 +20,7 @@ class ApplicationSolar : public Application {
   // calculate model matrix
   glm::fmat4 calculatePlanetModelMatrix(glm::fmat4 model_matrix, planet const& planet_instance) const;
 
-  // void calculateOrbit(glm::fmat4 model_matrix, glm::vec3 planet_distance);
+  void calculateOrbit(float planet_distance) const;
 
   // caculate and upload the model- and normal matrix
   void uploadPlanetTransforms(planet const& planet_instance) const;
@@ -34,7 +34,7 @@ class ApplicationSolar : public Application {
 
  protected:
   void initializeOrbit();
-  void initializeStars(unsigned int );
+  void initializeStars(unsigned int number_stars);
   void initializePlanets();
   void initializeShaderPrograms();
   void initializeGeometry();
@@ -49,9 +49,9 @@ class ApplicationSolar : public Application {
 
   std::vector<GLfloat> m_star_list;
 
- model_object orbit_object;
+  model_object orbit_object;
 
- std::vector<GLfloat> m_orbit_list;
+  std::vector<GLfloat> m_orbit_list;
 };
 
 #endif

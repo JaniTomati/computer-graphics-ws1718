@@ -18,15 +18,15 @@ using namespace gl;
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
-#include <cmath>
+#include <math.h>
 
 ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  :Application{resource_path}
  ,planet_object{}
- ,star_object{}
- ,orbit_object{}
  ,m_planet_list{}
+ ,star_object{}
  ,m_star_list{}
+ ,orbit_object{}
  ,m_orbit_list{}
 {
   initializePlanets();
@@ -263,18 +263,20 @@ void ApplicationSolar::initializeStars(unsigned int number_stars) {
 
 void ApplicationSolar::initializeOrbit() {
   for (unsigned int i = 0; i < 359; ++i) {
-    m_orbit_list.push_back(static_cast<GLfloat> (cos((i * M_PI))/180));
+    // m_orbit_list.push_back(static_cast<GLfloat> (cos((i * M_PI))/180));
+    m_orbit_list.push_back(static_cast<GLfloat> (cos((i * M_PI)/180)));
+
     m_orbit_list.push_back(static_cast<GLfloat> (0.0f));
-    m_orbit_list.push_back(static_cast<GLfloat> (-sin((i * M_PI))/180));
+    m_orbit_list.push_back(static_cast<GLfloat> (-sin((i * M_PI)/180)));
   }
 
   // m_orbit_list.push_back(1.0f);
   // m_orbit_list.push_back(0.0f);
   // m_orbit_list.push_back(-0.0f);
 
-  for(int i = 0; i < m_orbit_list.size(); ++i) {
+  for(unsigned int i = 0; i < m_orbit_list.size(); ++i) {
     std::cout << m_orbit_list[i] << std::endl;
-    std::cout << i << " so viele schöne iiiiis" << std::endl;
+    // std::cout << i << " so viele schöne iiiiis" << std::endl;
   }
 }
 

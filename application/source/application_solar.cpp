@@ -117,7 +117,7 @@ glm::fmat4 ApplicationSolar::calculatePlanetModelMatrix(glm::fmat4 model_matrix,
 void ApplicationSolar::calculateOrbit(planet const& planet_instance) const {
   float planet_distance = planet_instance.m_distance_to_origin;
   // compute orbit for static origin (sun)
-  if(planet_instance.m_orbit_origin == "sun") {
+  if (planet_instance.m_orbit_origin == "sun") {
     glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3 {planet_distance, planet_distance, planet_distance});
     glUseProgram(m_shaders.at("orbit").handle);
     glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
@@ -153,21 +153,18 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
 
         // transform moon planet
         model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
-
-        // upload model matrix
-        glUseProgram(m_shaders.at("planet").handle);
-        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                           1, GL_FALSE, glm::value_ptr(model_matrix));
         break;
       }
     }
   } else {
     // transform planet (where orbit planet is sun)
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
-    glUseProgram(m_shaders.at("planet").handle);
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                       1, GL_FALSE, glm::value_ptr(model_matrix));
   }
+  // upload model matrix
+  glUseProgram(m_shaders.at("planet").handle);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                     1, GL_FALSE, glm::value_ptr(model_matrix));
+                     
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
   glUseProgram(m_shaders.at("planet").handle);

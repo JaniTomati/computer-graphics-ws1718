@@ -40,8 +40,8 @@ void ApplicationSolar::render() const {
   // render Stars
   glBindVertexArray(star_object.vertex_AO);
   glUseProgram(m_shaders.at("star").handle);
-  // glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
-  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements); //Not sure here
+  //glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
+  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements);
 
   // bind shader to upload uniforms
   glUseProgram(m_shaders.at("planet").handle);

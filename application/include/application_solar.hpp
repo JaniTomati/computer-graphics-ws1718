@@ -20,7 +20,7 @@ class ApplicationSolar : public Application {
   // calculate model matrix
   glm::fmat4 calculatePlanetModelMatrix(glm::fmat4 model_matrix, planet const& planet_instance) const;
 
-  void calculateOrbit(float planet_distance) const;
+  void calculateOrbit(planet const& planet_instance) const;
 
   // caculate and upload the model- and normal matrix
   void uploadPlanetTransforms(planet const& planet_instance) const;

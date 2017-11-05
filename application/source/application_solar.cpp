@@ -48,7 +48,7 @@ void ApplicationSolar::render() const {
   glUseProgram(m_shaders.at("planet").handle);
   // iterate planet vector and create planet transforms for each planet
   for (auto const& planet : m_planet_list) {
-    calculateOrbit(planet.m_distance_to_origin);
+    calculateOrbit(planet);
     glBindVertexArray(orbit_object.vertex_AO);
     //glUseProgram(m_shaders.at("orbit").handle);
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
@@ -117,11 +117,25 @@ glm::fmat4 ApplicationSolar::calculatePlanetModelMatrix(glm::fmat4 model_matrix,
   return model_matrix;
 }
 
-void ApplicationSolar::calculateOrbit(float planet_distance) const {
-  glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3 {planet_distance, planet_distance, planet_distance});
-  glUseProgram(m_shaders.at("orbit").handle);
-  glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
-                    1, GL_FALSE, glm::value_ptr(model_matrix));
+void ApplicationSolar::calculateOrbit(planet const& planet_instance) const {
+  float planet_distance = planet_instance.m_distance_to_origin;
+  if(planet_instance.m_orbit_origin == "sun") {
+    glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3 {planet_distance, planet_distance, planet_distance});
+    glUseProgram(m_shaders.at("orbit").handle);
+    glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
+    1, GL_FALSE, glm::value_ptr(model_matrix));
+  } else {
+    for (auto const& orbit_base : m_planet_list) {
+      if (orbit_base.m_name == planet_instance.m_orbit_origin) {
+        glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * orbit_base.m_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
+        model_matrix = glm::translate(model_matrix, glm::fvec3 {0.0f, 0.0f, -1.0f * orbit_base.m_distance_to_origin});
+        model_matrix = glm::scale(model_matrix, glm::fvec3 {planet_distance, planet_distance, planet_distance});
+        glUseProgram(m_shaders.at("orbit").handle);
+        glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
+        1, GL_FALSE, glm::value_ptr(model_matrix));
+      }
+    }
+  }
 }
 
 // caculate and upload the model- and normal matrix
@@ -265,18 +279,8 @@ void ApplicationSolar::initializeOrbit() {
   for (unsigned int i = 0; i < 359; ++i) {
     // m_orbit_list.push_back(static_cast<GLfloat> (cos((i * M_PI))/180));
     m_orbit_list.push_back(static_cast<GLfloat> (cos((i * M_PI)/180)));
-
     m_orbit_list.push_back(static_cast<GLfloat> (0.0f));
     m_orbit_list.push_back(static_cast<GLfloat> (-sin((i * M_PI)/180)));
-  }
-
-  // m_orbit_list.push_back(1.0f);
-  // m_orbit_list.push_back(0.0f);
-  // m_orbit_list.push_back(-0.0f);
-
-  for(unsigned int i = 0; i < m_orbit_list.size(); ++i) {
-    std::cout << m_orbit_list[i] << std::endl;
-    // std::cout << i << " so viele schöne iiiiis" << std::endl;
   }
 }
 

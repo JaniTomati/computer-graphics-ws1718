@@ -37,12 +37,11 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 }
 
 void ApplicationSolar::render() const {
-
   // render Stars
   glBindVertexArray(star_object.vertex_AO);
   glUseProgram(m_shaders.at("star").handle);
-  // glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
-  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements); //Not sure here
+  //glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
+  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements);
 
   // bind shader to upload uniforms
   glUseProgram(m_shaders.at("planet").handle);
@@ -52,7 +51,10 @@ void ApplicationSolar::render() const {
     calculateOrbit(planet);
     // render Orbit
     glBindVertexArray(orbit_object.vertex_AO);
+<<<<<<< HEAD
     glUseProgram(m_shaders.at("orbit").handle);
+=======
+>>>>>>> c3f981c795a39f77c773e3e4e0257f75a4450de7
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
     // calculates model- and normal-matrix
@@ -124,7 +126,7 @@ glm::fmat4 ApplicationSolar::calculatePlanetModelMatrix(glm::fmat4 model_matrix,
 void ApplicationSolar::calculateOrbit(planet const& planet_instance) const {
   float planet_distance = planet_instance.m_distance_to_origin;
   // compute orbit for static origin (sun)
-  if(planet_instance.m_orbit_origin == "sun") {
+  if (planet_instance.m_orbit_origin == "sun") {
     glm::fmat4 model_matrix = glm::scale(glm::fmat4{}, glm::fvec3 {planet_distance, planet_distance, planet_distance});
     glUseProgram(m_shaders.at("orbit").handle);
     glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
@@ -163,7 +165,6 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
 
         // transform moon planet
         model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
-
         // upload model matrix
         glUseProgram(m_shaders.at("planet").handle);
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
@@ -177,7 +178,6 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
 
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                           1, GL_FALSE, glm::value_ptr(normal_matrix));
-
         break;
       }
     }
@@ -194,6 +194,11 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     glUseProgram(m_shaders.at("planet").handle);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                         1, GL_FALSE, glm::value_ptr(model_matrix));
+  }
+  // upload model matrix
+  glUseProgram(m_shaders.at("planet").handle);
+  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
+                     1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
     glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
     glUseProgram(m_shaders.at("planet").handle);
@@ -304,12 +309,7 @@ void ApplicationSolar::initializeShaderPrograms() {
 
 // fill m_star_list with random star values for given number of stars
 void ApplicationSolar::initializeStars(unsigned int number_stars) {
-  for (unsigned int i = 0; i < number_stars; ++i) {
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
-    m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
+  for (unsigned int i = 0; i < 6 * number_stars; ++i) {
     m_star_list.push_back(static_cast<GLfloat> (rand() % 1000 + 1) - 500);
   }
 }

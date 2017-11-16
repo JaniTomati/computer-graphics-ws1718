@@ -51,10 +51,7 @@ void ApplicationSolar::render() const {
     calculateOrbit(planet);
     // render Orbit
     glBindVertexArray(orbit_object.vertex_AO);
-<<<<<<< HEAD
     glUseProgram(m_shaders.at("orbit").handle);
-=======
->>>>>>> c3f981c795a39f77c773e3e4e0257f75a4450de7
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
     // calculates model- and normal-matrix
@@ -191,21 +188,10 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
                         1, GL_FALSE, glm::value_ptr(model_matrix));
   } else {
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
+    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
     glUseProgram(m_shaders.at("planet").handle);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                         1, GL_FALSE, glm::value_ptr(model_matrix));
-  }
-  // upload model matrix
-  glUseProgram(m_shaders.at("planet").handle);
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                     1, GL_FALSE, glm::value_ptr(model_matrix));
-  // extra matrix for normal transformation to keep them orthogonal to surface
-    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-    glUseProgram(m_shaders.at("planet").handle);
-    glUniform3f(m_shaders.at("planet").u_locs.at("ColorVector"),
-                        planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                        1, GL_FALSE, glm::value_ptr(normal_matrix));
   }
 }
 

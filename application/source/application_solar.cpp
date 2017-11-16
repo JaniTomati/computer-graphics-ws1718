@@ -9,7 +9,7 @@
 // use gl definitions from glbinding
 using namespace gl;
 
-//dont load gl bindings from glfw
+// dont load gl bindings from glfw
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -53,7 +53,6 @@ void ApplicationSolar::render() const {
     // render Orbit
     glBindVertexArray(orbit_object.vertex_AO);
     glUseProgram(m_shaders.at("orbit").handle);
-    // glUseProgram(m_shaders.at("orbit").handle);
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
     // calculates model- and normal-matrix
@@ -71,7 +70,11 @@ void ApplicationSolar::updateView() {
   // upload matrix to gpu
   glUseProgram(m_shaders.at("planet").handle);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ViewMatrix"),
-                     1, GL_FALSE, glm::value_ptr(view_matrix));
+                      1, GL_FALSE, glm::value_ptr(view_matrix));
+
+  glUseProgram(m_shaders.at("sun").handle);
+  glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("ViewMatrix"),
+                      1, GL_FALSE, glm::value_ptr(view_matrix));
 
   glUseProgram(m_shaders.at("star").handle);
   glUniformMatrix4fv(m_shaders.at("star").u_locs.at("ViewMatrix"),
@@ -86,6 +89,10 @@ void ApplicationSolar::updateProjection() {
   // upload matrix to gpu
   glUseProgram(m_shaders.at("planet").handle);
   glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ProjectionMatrix"),
+                      1, GL_FALSE, glm::value_ptr(m_view_projection));
+
+  glUseProgram(m_shaders.at("sun").handle);
+  glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("ProjectionMatrix"),
                       1, GL_FALSE, glm::value_ptr(m_view_projection));
 
   glUseProgram(m_shaders.at("star").handle);
@@ -142,6 +149,9 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
   // create model matrix for our given planet
   glm::fmat4 model_matrix;
   glm::fmat4 orbit_matrix;
+  std::cout << planet_instance.m_planet_color.x << std::endl;
+  std::cout << planet_instance.m_planet_color.y << std::endl;
+  std::cout << planet_instance.m_planet_color.z << std::endl;
   // planet transforms for _moon planets
   if (planet_instance.m_planet_type == _moon) {
     // find the planet which is orbited by the given moon
@@ -158,21 +168,40 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         glUseProgram(m_shaders.at("planet").handle);
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
+
+        // extra matrix for normal transformation to keep them orthogonal to surface
+        glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+        glUseProgram(m_shaders.at("planet").handle);
+        glUniform3f(m_shaders.at("planet").u_locs.at("ColorVector"),
+                          planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
+
+        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                          1, GL_FALSE, glm::value_ptr(normal_matrix));
+
         break;
       }
     }
-  } else {
+  } else if (planet_instance.m_planet_type == _sun){
     // transform planet (where orbit planet is sun)
+    model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
+    glUseProgram(m_shaders.at("sun").handle);
+    glUniform3f(m_shaders.at("sun").u_locs.at("ColorVector"),
+                        planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
+    glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("ModelMatrix"),
+                        1, GL_FALSE, glm::value_ptr(model_matrix));
+  } else {
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
     glUseProgram(m_shaders.at("planet").handle);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                       1, GL_FALSE, glm::value_ptr(model_matrix));
-  }
+                        1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-  glUseProgram(m_shaders.at("planet").handle);
-  glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                     1, GL_FALSE, glm::value_ptr(normal_matrix));
+    glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+    glUseProgram(m_shaders.at("planet").handle);
+    glUniform3f(m_shaders.at("planet").u_locs.at("ColorVector"),
+                        planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                        1, GL_FALSE, glm::value_ptr(normal_matrix));
+  }
 }
 
 // handle key input
@@ -219,17 +248,17 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
-  planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun};
-  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet};
-  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet};
-  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet};
-  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet};
-  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet};
-  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet};
-  planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet};
-  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet};
-  planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet};
-  planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon};
+  planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}};
+  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}};
 
   // insert planets
   m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,
@@ -246,6 +275,16 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+  m_shaders.at("planet").u_locs["ColorVector"] = -1;
+
+  // store shader program objects in container
+  m_shaders.emplace("sun", shader_program{m_resource_path + "shaders/sun.vert",
+                                        m_resource_path + "shaders/sun.frag"});
+  // request uniform locations for shader program
+  m_shaders.at("sun").u_locs["ModelMatrix"] = -1;
+  m_shaders.at("sun").u_locs["ViewMatrix"] = -1;
+  m_shaders.at("sun").u_locs["ProjectionMatrix"] = -1;
+  m_shaders.at("sun").u_locs["ColorVector"] = -1;
 
   // store star shader program objects in container
   m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",

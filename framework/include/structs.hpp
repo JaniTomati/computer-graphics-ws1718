@@ -4,6 +4,7 @@
 #include <map>
 #include <glbinding/gl/gl.h>
 #include <string>
+#include <glm/vec3.hpp>
 // use gl definitions from glbinding
 using namespace gl;
 
@@ -55,13 +56,14 @@ struct shader_program {
 
 struct planet {
   planet(std::string const& name, float size, float rotation_speed,
-        float distance_to_origin, std::string const& orbit_origin, Planet_Type const& type) :
+        float distance_to_origin, std::string const& orbit_origin, Planet_Type const& type, glm::vec3 const& color) :
     m_name {name},
     m_size {float(size * 0.01f)},
     m_rotation_speed {float(rotation_speed * 0.001f)},
     m_distance_to_origin {float(distance_to_origin * 0.01f)},
     m_orbit_origin {orbit_origin},
-    m_planet_type {type} {}
+    m_planet_type {type},
+    m_planet_color {color} {}
 
   std::string m_name;
   float m_size;
@@ -69,5 +71,6 @@ struct planet {
   float m_distance_to_origin;
   std::string m_orbit_origin; // orbit planet
   Planet_Type m_planet_type;  // type of planet (_moon, _sun, _planet)
+  glm::vec3 m_planet_color;
 };
 #endif

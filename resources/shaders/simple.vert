@@ -10,10 +10,25 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
 
+uniform vec3 ColorVector;
+
 out vec3 pass_Normal;
+out vec3 camera_Position;
+out vec3 planet_Color;
+out vec3 world_Position;
+out vec3 world_Normal;
 
 void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
 	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+
+	mat4 inverseViewMatrix = inverse(ViewMatrix);
+  vec3 camera_Position = inverseViewMatrix[3].xyz;
+
+	vec3 planet_Color = ColorVector;
+
+	vec4 PositionMatrix = ModelMatrix * vec4(in_Position, 1.0);
+	world_Position = PositionMatrix.xyz / PositionMatrix.w;
+	world_Normal = (ModelMatrix * vec4(in_Normal, 0.0)).xyz;
 }

@@ -1,25 +1,36 @@
 #version 150
 
 in vec3 pass_Normal;
-in vec3 camera_Position;
+in vec3 vertex_Position;
 in vec3 planet_Color;
-in vec3 world_Position;
-in vec3 world_Normal;
 
 out vec4 out_Color;
 
 const vec3 light_Position = vec3(0.0, 0.0, 0.0);
 const vec3 specular_Color = vec3(1.0, 1.0, 1.0);
-const vec3 ambient_Color;
-const vec3 diffuse_Color;
-const float shininess;
+const vec3 ambient_Color = vec3(0.1, 0.0, 0.0);
+const vec3 diffuse_Color = vec3(0.5, 0.0, 0.0);
+const float shininess = 16.0;
+const float screen_Gamma = 2.2;
 
 void main() {
-  vec3 N = normalize(world_Normal);
-  vec3 L = normalize(light_Position - world_Position);
+  vec3 N = normalize(pass_Normal);
+  vec3 L = normalize(light_Position - vertex_Position); // light direction
+  vec3 V = normalize(-vertex_Position); // view direction
 
   float lambertian = max(dot(L, N), 0.0);
-  float specular = 0.0;
 
-  out_Color = vec4(abs(normalize(pass_Normal)), 1.0);
+  float specular = 0.0;
+  // calculate specular reflection if the surface is oriented to the light source
+  if(lambertian > 0.0) {
+    // half vector
+    vec3 H = normalize(L + V);
+    float specular_Angle = max(dot(H, N), 0.0);
+    specular = pow(specular_Angle, shininess);
+   }
+
+   vec3 color_Linear = ambient_Color + lambertian * diffuse_Color + specular * specular_Color;
+
+  vec3 color_Gamma_Corrected = pow(color_Linear, vec3(1.0/screen_Gamma));
+  out_Color = vec4(color_Gamma_Corrected, 1.0);
 }

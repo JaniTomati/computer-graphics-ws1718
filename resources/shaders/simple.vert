@@ -26,5 +26,5 @@ void main(void)
 	vec4 vertex_Position4 = ModelMatrix * vec4(in_Position, 1.0);
 	vertex_Position = vec3(vertex_Position4) / vertex_Position4.w;
 
-	vec3 planet_Color = ColorVector;
+	planet_Color = ColorVector;
 }

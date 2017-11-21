@@ -30,7 +30,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,m_orbit_list{}
 {
   initializePlanets();
-  initializeStars(100000);
+  initializeStars(50000);
   initializeOrbit();
   initializeShaderPrograms();
   initializeGeometry();
@@ -236,16 +236,25 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
   // mouse handling
   m_view_transform = glm::rotate(m_view_transform, -0.025f, glm::fvec3{pos_x, pos_y, 0.0f});
   updateView();
+
+  // NOT WORKING AS INTENDED YET
+  // if(pos_y > pos_x) {
+  //   m_view_transform = glm::rotate(m_view_transform, -0.025f, glm::fvec3{0.0f, pos_y, 0.0f});
+  //   updateView();
+  // } else if(pos_y < pos_x){
+  //   m_view_transform = glm::rotate(m_view_transform,(float) -pos_x, glm::fvec3{0.0f, 1.0f, 0.0f});
+  //   updateView();
+  // }
 }
 
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
   planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}};
-  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
-  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
-  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
-  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
+  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {1.0, 0.0, 0} /*{0.0, 1.0, 0}*/};
+  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {1.0, 0.0, 0} /*{0.0, 1.0, 0}*/};
+  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {1.0, 0.0, 0} /*{0.0, 1.0, 0}*/};
+  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {1.0, 0.0, 0} /*{0.0, 1.0, 0}*/};
   planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
   planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};
   planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0}};

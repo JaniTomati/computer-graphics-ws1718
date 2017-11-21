@@ -15,9 +15,9 @@ const float shininess = 16.0;
 const float screen_Gamma = 2.2;
 
 void main() {
-  vec3 N = normalize(pass_Normal);
-  vec3 L = normalize(light_Position - vertex_Position_World); // light direction
-  vec3 V = normalize(-vertex_Position_World); // view direction
+  vec3 N = normalize(pass_Normal); // normal
+  vec3 L = normalize(light_Position - vertex_Position); // light direction
+  vec3 V = normalize(-vertex_Position); // view direction
 
   float lambertian = max(dot(L, N), 0.0); // diffuse reflectance
 

@@ -52,6 +52,8 @@ class ApplicationSolar : public Application {
   model_object orbit_object;
 
   std::vector<GLfloat> m_orbit_list;
+
+  int shader_Mode = 1;
 };
 
 #endif

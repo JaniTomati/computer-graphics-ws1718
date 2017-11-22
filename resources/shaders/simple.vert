@@ -13,20 +13,26 @@ uniform mat4 NormalMatrix;
 
 uniform vec3 ColorVector;
 
+uniform int ShaderMode;
+
 out vec3 pass_Normal;
+out vec3 pass_Normal_View;
 out vec3 vertex_Position;
 out vec3 vertex_Position_World;
 out vec3 planet_Color;
+flat out int shader_Mode;
 
 
 void main(void)
 {
 	gl_Position = (ProjectionMatrix * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
 	pass_Normal = (ModelMatrix * vec4(in_Normal, 0.0)).xyz;
+	pass_Normal_View = (ViewMatrix * vec4(pass_Normal, 0.0)).xyz;
 
 	vec4 vertex_Position4 = ModelMatrix * vec4(in_Position, 1.0);
 	vertex_Position = vertex_Position4.xyz / vertex_Position4.w;
 	vertex_Position_World = (ViewMatrix * vec4(vertex_Position, 1.0)).xyz;
 
 	planet_Color = ColorVector;
+	shader_Mode = ShaderMode;
 }

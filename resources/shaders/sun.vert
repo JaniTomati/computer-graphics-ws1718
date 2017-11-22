@@ -4,7 +4,7 @@
 layout(location = 0) in vec3 in_Position;
 layout(location = 1) in vec3 in_Normal;
 
-//Matrix Uniforms as specified with glUniformMatrix4fv
+// Matrix Uniforms as specified with glUniformMatrix4fv
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
@@ -20,14 +20,14 @@ flat out int shader_Mode;
 
 void main(void)
 {
-	shader_Mode = ShaderMode;
-	sun_Color = ColorVector;
+	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
+	pass_Normal_View = (ModelMatrix * ViewMatrix * vec4(in_Normal, 0.0)).xyz;
 
 	vec4 vertex_Position4 = ModelMatrix * vec4(in_Position, 1.0);
 	vec3 vertex_Position = vertex_Position4.xyz / vertex_Position4.w;
 	vertex_Position_World = (ViewMatrix * vec4(vertex_Position, 1.0)).xyz;
 
-	pass_Normal_View = (ModelMatrix * ViewMatrix * vec4(in_Normal, 0.0)).xyz;
-
-	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
+	// transfer user input
+	shader_Mode = ShaderMode;
+	sun_Color = ColorVector;
 }

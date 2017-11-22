@@ -168,12 +168,12 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
 
         // extra matrix for normal transformation to keep them orthogonal to surface
         glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                          1, GL_FALSE, glm::value_ptr(normal_matrix));
+
         glUseProgram(m_shaders.at("planet").handle);
         glUniform3f(m_shaders.at("planet").u_locs.at("ColorVector"),
                           planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
-
-        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                          1, GL_FALSE, glm::value_ptr(normal_matrix));
         break;
       }
     }
@@ -195,6 +195,11 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
                       planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                         1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    // extra matrix for normal transformation to keep them orthogonal to surface
+    normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                      1, GL_FALSE, glm::value_ptr(normal_matrix));
   }
 }
 

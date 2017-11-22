@@ -56,9 +56,11 @@ void main() {
     else if(lambertian > 0.3) {lambertian = 0.6;}
     else if(lambertian > 0.0) {lambertian = 0.3;}
 
+    // highlight the planets border in a different color
     if(abs(normal_View_Angle) < 0.3) {
       color_Linear = vec3(1.0, 0.0, 0.0);
     } else {
+      // calculate planet color
       color_Linear = ambient_Color + lambertian * diffuse_Color * planet_Color + specular * specular_Color;
     }
   }

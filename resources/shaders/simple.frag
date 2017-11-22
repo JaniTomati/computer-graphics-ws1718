@@ -20,12 +20,11 @@ const vec3 diffuse_Color = vec3(0.5, 0.5, 0.5);  // diffusely reflected light fr
 // const float ambient_Intensity = 0.01;
 // const float diffuse_Intensity = 0.5;
 // const float specular_Intensity = 1.0;
-
 const float shininess = 16.0;
 const float screen_Gamma = 2.2;
 
 void main() {
-
+  // Blinn-Phong-Model
   vec3 N  = normalize(pass_Normal); // normal
   vec3 NV = normalize(pass_Normal_View); // normal view
   vec3 L  = normalize(light_Position - vertex_Position); // light direction
@@ -42,10 +41,15 @@ void main() {
   if(lambertian > 0.0) {
     specular = pow(specular_Angle, shininess * 10);
   }
+
+  // calculate planet color
+  color_Linear = ambient_Color + lambertian * diffuse_Color * planet_Color + specular * specular_Color;
+
+  // Cell-Shading-Model
   if (shader_Mode == 2) {
     float normal_View_Angle = dot(-normalize(vertex_Position_World), NV);
 
-    specular = pow(specular_Angle, shininess*10);
+    specular = pow(specular_Angle, shininess * 10);
 
     if(lambertian > 0.9) {lambertian = 1;}
     else if(lambertian > 0.6) {lambertian = 0.9;}
@@ -57,14 +61,9 @@ void main() {
     } else {
       color_Linear = ambient_Color + lambertian * diffuse_Color * planet_Color + specular * specular_Color;
     }
-
-    vec3 color_Gamma_Corrected = pow(color_Linear, vec3(1.0/screen_Gamma));
-    out_Color = vec4(color_Gamma_Corrected, 1.0);
-
-  } else {
-    color_Linear = ambient_Color + lambertian * diffuse_Color * planet_Color + specular * specular_Color;
-
-    vec3 color_Gamma_Corrected = pow(color_Linear, vec3(1.0/screen_Gamma));
-    out_Color = vec4(color_Gamma_Corrected, 1.0);
   }
+
+  // calculate gamme correction
+  vec3 color_Gamma_Corrected = pow(color_Linear, vec3(1.0/screen_Gamma));
+  out_Color = vec4(color_Gamma_Corrected, 1.0);
 }

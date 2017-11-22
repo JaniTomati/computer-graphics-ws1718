@@ -33,6 +33,7 @@ void main(void)
 	vertex_Position = vertex_Position4.xyz / vertex_Position4.w;
 	vertex_Position_World = (ViewMatrix * vec4(vertex_Position, 1.0)).xyz;
 
+	// transfer user input
 	planet_Color = ColorVector;
 	shader_Mode = ShaderMode;
 }

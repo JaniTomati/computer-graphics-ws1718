@@ -16,6 +16,11 @@ const vec3 light_Position = vec3(0.0, 0.0, 0.0);
 const vec3 specular_Color = vec3(1.0, 1.0, 1.0); // color of the specular highlights
 const vec3 ambient_Color = vec3(0.01, 0.01, 0.01);  // indirect light coming from sourroundings
 const vec3 diffuse_Color = vec3(0.5, 0.5, 0.5);  // diffusely reflected light from surface microfacets
+// const float sun_Intensity = 1.0;
+// const float ambient_Intensity = 0.01;
+// const float diffuse_Intensity = 0.5;
+// const float specular_Intensity = 1.0;
+
 const float shininess = 16.0;
 const float screen_Gamma = 2.2;
 

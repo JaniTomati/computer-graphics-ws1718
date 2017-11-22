@@ -264,13 +264,13 @@ void ApplicationSolar::initializePlanets() {
   // initialize planets
   planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}};
   planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
+  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}};
+  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}};
+  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}};
+  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}};
+  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}};
   planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
+  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}};
   planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
   planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}};
 

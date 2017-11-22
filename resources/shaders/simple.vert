@@ -9,7 +9,6 @@ layout(location = 1) in vec3 in_Normal;
 uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
-// uniform mat4 NormalMatrix;
 
 uniform vec3 ColorVector;
 

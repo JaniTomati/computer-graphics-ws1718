@@ -28,6 +28,8 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,m_star_list{}
  ,orbit_object{}
  ,m_orbit_list{}
+ ,texture_object{}
+ ,m_loaded_textures{}
  ,shader_Mode{}
 {
   initializePlanets();
@@ -279,15 +281,17 @@ void ApplicationSolar::loadTextures() {
   texture moon_texture {"moon", m_resource_path + "textures/2k_moon.tga"};
 
   // insert textures to m_texture_list
-  m_texture_list.insert(m_texture_list.end(),{sun_texture, earth_texture_day,
+  std::vector<texture> texture_list;
+  texture_list.insert(texture_list.end(),{sun_texture, earth_texture_day,
                         earth_texture_night, venus_texture, mars_texture, jupiter_texture,
                         mercury_texture, saturn_texture, uranus_texture,
                         neptune_texture, pluto_texture, moon_texture});
 
   // save loaded textures in map<name, pixel_data>
-  for (auto const& texture : m_texture_list) {
+  for (auto const& texture : texture_list) {
     pixel_data loaded_pixel_data = texture_loader::file(texture.m_file_path);
     std::pair<std::string, pixel_data> loaded_texture = std::make_pair(texture.m_name, loaded_pixel_data);
+
     std::cout << "Load " << loaded_texture.first << " texture!" << std::endl;
     m_loaded_textures.insert(loaded_texture);
   }
@@ -450,7 +454,25 @@ void ApplicationSolar::initializeGeometry() {
 }
 
 void ApplicationSolar::initializeTextures() {
+  // load textures using texture loader
   loadTextures();
+
+  // upload data to GPU
+  for (auto const& texture : m_loaded_textures) {
+    // 1. activate Texture Unit to which to bind texture
+    glActiveTexture(GL_TEXTURE0);
+    // 2. generate texture object
+    glGenTextures(1, &texture_object.handle);
+    // 3. bind Texture Object to 2d texture binding point of unit
+    glBindTexture(GL_TEXTURE_2D, texture_object.handle);
+    // 4. define interpolation type when fragment covers multiple texels (texture pixels)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // 5. define interpolation type when fragment does not exactly cover one texel
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 6. format Texture Object bound to the 2d binding point
+    glTexImage2D(GL_TEXTURE_2D, 0, texture.second.channels, texture.second.width, texture.second.height, 0,
+                 texture.second.channels, texture.second.channel_type, &texture.second.pixels);
+  }
 }
 
 // deconstruct everything

@@ -44,21 +44,16 @@ class ApplicationSolar : public Application {
   void initializeTextures();
   void updateView();
 
-  // cpu representation of model
-  model_object planet_object;
-  // a vector that saves all the planets that are to be rendered in the program
+  model_object planet_object; // cpu representation of model
   std::vector<planet> m_planet_list;
 
   model_object star_object;
-
   std::vector<GLfloat> m_star_list;
 
   model_object orbit_object;
-
   std::vector<GLfloat> m_orbit_list;
 
-  std::vector<texture> m_texture_list;
-
+  texture_object texture_object;
   std::map<std::string, pixel_data> m_loaded_textures;
 
   int shader_Mode = 1;

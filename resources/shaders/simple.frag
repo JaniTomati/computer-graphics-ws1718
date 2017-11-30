@@ -4,7 +4,7 @@ in vec3 pass_Normal;
 in vec3 pass_Normal_View;
 in vec3 vertex_Position;
 in vec3 vertex_Position_World;
-in vec3 planet_Color;
+in vec4 planet_Color;
 
 flat in int shader_Mode;
 
@@ -43,7 +43,7 @@ void main() {
   }
 
   // calculate planet color
-  color_Linear = ambient_Color + lambertian * diffuse_Color * planet_Color + specular * specular_Color;
+  color_Linear = ambient_Color + lambertian * diffuse_Color * vec3(planet_Color).xyz + specular * specular_Color;
 
   // Cell-Shading-Model
   if (shader_Mode == 2) {
@@ -61,7 +61,7 @@ void main() {
       color_Linear = vec3(1.0, 0.0, 0.0);
     } else {
       // calculate planet color
-      color_Linear = ambient_Color + lambertian * diffuse_Color * planet_Color + specular * specular_Color;
+      color_Linear = ambient_Color + lambertian * diffuse_Color * vec3(planet_Color).xyz + specular * specular_Color;
     }
   }
 

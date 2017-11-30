@@ -58,6 +58,11 @@ void ApplicationSolar::render() const {
     glUseProgram(m_shaders.at("orbit").handle);
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
+    // activate Texture Unit to which to bind texture
+    glActiveTexture(GL_TEXTURE0);
+    // bind Texture Object to 2d texture binding point of unit
+    glBindTexture(GL_TEXTURE_2D, texture_object.handle);
+
     // calculates model- and normal-matrix
     uploadPlanetTransforms(planet);
     // bind the VAO to draw
@@ -172,6 +177,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
                     planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
+        glUniform1i(m_shaders.at("planet").u_locs.at("ColorTex"), 0);
 
         // extra matrix for normal transformation to keep them orthogonal to surface
         // glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
@@ -188,6 +194,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
                 planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
     glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
+    glUniform1i(m_shaders.at("sun").u_locs.at("ColorTex"), 0);
   } else {
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
     normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
@@ -197,6 +204,8 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
                 planet_instance.m_planet_color.x, planet_instance.m_planet_color.y, planet_instance.m_planet_color.z);
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
+    glUniform1i(m_shaders.at("planet").u_locs.at("ColorTex"), 0);
+
 
     // extra matrix for normal transformation to keep them orthogonal to surface
     // glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
@@ -329,6 +338,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("planet").u_locs["ColorVector"] = -1;
   m_shaders.at("planet").u_locs["ShaderMode"] = -1;
+  m_shaders.at("planet").u_locs["ColorTex"] = -1;
 
   // store shader program objects in container
   m_shaders.emplace("sun", shader_program{m_resource_path + "shaders/sun.vert",
@@ -339,6 +349,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("sun").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("sun").u_locs["ColorVector"] = -1;
   m_shaders.at("sun").u_locs["ShaderMode"] = -1;
+  m_shaders.at("sun").u_locs["ColorTex"] = -1;
 
   // store star shader program objects in container
   m_shaders.emplace("star", shader_program{m_resource_path + "shaders/star.vert",
@@ -400,8 +411,12 @@ void ApplicationSolar::initializeGeometry() {
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
+  // activate third attribute on gpu
+  glEnableVertexAttribArray(2);
+  // third attribute 3 is 3 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TEXCOORD]);
 
-   // generate generic buffer
+  // generate generic buffer
   glGenBuffers(1, &planet_object.element_BO);
   // bind this as an vertex array buffer containing all attributes
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planet_object.element_BO);
@@ -457,7 +472,7 @@ void ApplicationSolar::initializeTextures() {
   // load textures using texture loader
   loadTextures();
 
-  // upload data to GPU
+  // Texture specification
   for (auto const& texture : m_loaded_textures) {
     // 1. activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
@@ -469,6 +484,9 @@ void ApplicationSolar::initializeTextures() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // 5. define interpolation type when fragment does not exactly cover one texel
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // set the wrap parameter for texture coordinate s and t
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // 6. format Texture Object bound to the 2d binding point
     glTexImage2D(GL_TEXTURE_2D, 0, texture.second.channels, texture.second.width, texture.second.height, 0,
                  texture.second.channels, texture.second.channel_type, &texture.second.pixels);

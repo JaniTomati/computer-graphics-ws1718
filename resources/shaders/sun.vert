@@ -3,6 +3,7 @@
 // vertex attributes of VAO
 layout(location = 0) in vec3 in_Position;
 layout(location = 1) in vec3 in_Normal;
+layout(location = 2) in vec2 in_Texture_Coordinates;
 
 // Matrix Uniforms as specified with glUniformMatrix4fv
 uniform mat4 ModelMatrix;
@@ -10,12 +11,12 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
 uniform vec3 ColorVector;
-
+uniform sampler2D ColorTex;
 uniform int ShaderMode;
 
 out vec3 pass_Normal_View;
 out vec3 vertex_Position_World;
-out vec3 sun_Color;
+out vec4 sun_Color;
 flat out int shader_Mode;
 
 void main(void)
@@ -29,5 +30,6 @@ void main(void)
 
 	// transfer user input
 	shader_Mode = ShaderMode;
-	sun_Color = ColorVector;
+	//sun_Color = ColorVector;
+	sun_Color = texture(ColorTex, in_Texture_Coordinates);
 }

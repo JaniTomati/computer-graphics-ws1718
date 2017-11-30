@@ -2,7 +2,7 @@
 
 in vec3 pass_Normal_View;
 in vec3 vertex_Position_World;
-in vec3 sun_Color;
+in vec4 sun_Color;
 flat in int shader_Mode;
 
 out vec4 out_Color;
@@ -19,12 +19,12 @@ void main() {
       color_Linear = vec3(1.0, 0.0, 0.0);
     } else {
       // set the sun color
-      color_Linear = sun_Color;
+      color_Linear = vec3(sun_Color).xyz;
     }
     out_Color = vec4(color_Linear, 1.0);
 
     // default: set plain sun color
   } else {
-    out_Color = vec4(sun_Color, 1.0);
+    out_Color = vec4(vec3(sun_Color).xyz, 1.0);
   }
 }

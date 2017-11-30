@@ -3,8 +3,9 @@
 
 #include <map>
 #include <glbinding/gl/gl.h>
-#include <string>
 #include <glm/vec3.hpp>
+#include <string>
+
 // use gl definitions from glbinding
 using namespace gl;
 
@@ -72,5 +73,14 @@ struct planet {
   std::string m_orbit_origin; // orbit planet
   Planet_Type m_planet_type;  // type of planet (_moon, _sun, _planet)
   glm::vec3 m_planet_color;
+};
+
+struct texture {
+  texture(std::string const& name, std::string const& file_path) :
+    m_name {name},
+    m_file_path {file_path} {}
+
+  std::string m_name;
+  std::string m_file_path;
 };
 #endif

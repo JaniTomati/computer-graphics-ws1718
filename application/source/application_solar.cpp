@@ -35,6 +35,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
   initializeOrbit();
   initializeShaderPrograms();
   initializeGeometry();
+  initializeTextures();
 }
 
 void ApplicationSolar::render() const {
@@ -262,6 +263,36 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
   // }
 }
 
+void ApplicationSolar::loadTextures() {
+  // initialize textures
+  texture sun_texture {"sun", m_resource_path + "textures/2k_sun.tga"};
+  texture earth_texture_day {"earth_day", m_resource_path + "textures/2k_earth_daymap.tga"};
+  texture earth_texture_night {"earth_night", m_resource_path  + "textures/2k_earth_nightmap.tga"};
+  texture venus_texture {"venus", m_resource_path + "textures/2k_venus_surface.tga"};
+  texture mars_texture {"mars", m_resource_path + "textures/2k_mars.tga"};
+  texture jupiter_texture {"jupiter", m_resource_path + "textures/2k_jupiter.tga"};
+  texture mercury_texture {"mercury", m_resource_path + "textures/2k_mercury.tga"};
+  texture saturn_texture {"saturn", m_resource_path + "textures/2k_saturn.tga"};
+  texture uranus_texture {"uranus", m_resource_path + "textures/2k_uranus.tga"};
+  texture neptune_texture {"neptune", m_resource_path + "textures/2k_neptune.tga"};
+  texture pluto_texture {"pluto", m_resource_path + "textures/2k_pluto.tga"};
+  texture moon_texture {"moon", m_resource_path + "textures/2k_moon.tga"};
+
+  // insert textures to m_texture_list
+  m_texture_list.insert(m_texture_list.end(),{sun_texture, earth_texture_day,
+                        earth_texture_night, venus_texture, mars_texture, jupiter_texture,
+                        mercury_texture, saturn_texture, uranus_texture,
+                        neptune_texture, pluto_texture, moon_texture});
+
+  // save loaded textures in map<name, pixel_data>
+  for (auto const& texture : m_texture_list) {
+    pixel_data loaded_pixel_data = texture_loader::file(texture.m_file_path);
+    std::pair<std::string, pixel_data> loaded_texture = std::make_pair(texture.m_name, loaded_pixel_data);
+    std::cout << "Load " << loaded_texture.first << " texture!" << std::endl;
+    m_loaded_textures.insert(loaded_texture);
+  }
+}
+
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
@@ -416,6 +447,10 @@ void ApplicationSolar::initializeGeometry() {
   orbit_object.num_elements = GLsizei(orbit_model.data.size() / 3);
 
   glBindVertexArray(0);
+}
+
+void ApplicationSolar::initializeTextures() {
+  loadTextures();
 }
 
 // deconstruct everything

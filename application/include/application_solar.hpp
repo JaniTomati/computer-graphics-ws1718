@@ -4,6 +4,7 @@
 #include "application.hpp"
 #include "model.hpp"
 #include "structs.hpp"
+#include "texture_loader.hpp"
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -28,6 +29,8 @@ class ApplicationSolar : public Application {
   void keyCallback(int key, int scancode, int action, int mods);
   //handle delta mouse movement input
   void mouseCallback(double pos_x, double pos_y);
+  // use texture_loader to load textures
+  void loadTextures();
 
   // draw all objects
   void render() const;
@@ -38,6 +41,7 @@ class ApplicationSolar : public Application {
   void initializePlanets();
   void initializeShaderPrograms();
   void initializeGeometry();
+  void initializeTextures();
   void updateView();
 
   // cpu representation of model
@@ -52,6 +56,10 @@ class ApplicationSolar : public Application {
   model_object orbit_object;
 
   std::vector<GLfloat> m_orbit_list;
+
+  std::vector<texture> m_texture_list;
+
+  std::map<std::string, pixel_data> m_loaded_textures;
 
   int shader_Mode = 1;
 };

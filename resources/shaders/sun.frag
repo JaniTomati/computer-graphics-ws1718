@@ -2,7 +2,10 @@
 
 in vec3 pass_Normal_View;
 in vec3 vertex_Position_World;
-in vec4 sun_Color;
+in vec3 sun_Color;
+in vec2 texture_Coordinates;
+
+uniform sampler2D ColorTex;
 flat in int shader_Mode;
 
 out vec4 out_Color;

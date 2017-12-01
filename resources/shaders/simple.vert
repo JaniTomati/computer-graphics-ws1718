@@ -11,7 +11,6 @@ uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
-uniform sampler2D ColorTex;
 uniform vec3 ColorVector;
 
 uniform int ShaderMode;
@@ -20,7 +19,8 @@ out vec3 pass_Normal;
 out vec3 pass_Normal_View;
 out vec3 vertex_Position;
 out vec3 vertex_Position_World;
-out vec4 planet_Color;
+out vec3 planet_Color;
+out vec2 texture_Coordinates;
 flat out int shader_Mode;
 
 
@@ -35,7 +35,7 @@ void main(void)
 	vertex_Position_World = (ViewMatrix * vec4(vertex_Position, 1.0)).xyz;
 
 	// transfer user input
-	// planet_Color = ColorVector;
-	planet_Color = texture(ColorTex, in_Texture_Coordinates);
+	planet_Color = ColorVector;
+	texture_Coordinates = in_Texture_Coordinates;
 	shader_Mode = ShaderMode;
 }

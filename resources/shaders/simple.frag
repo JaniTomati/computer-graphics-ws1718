@@ -47,6 +47,7 @@ void main() {
 
   // calculate planet color
   color_Linear = ambient_Color + lambertian * diffuse_Color * vec3(planet_Color).xyz + specular * specular_Color;
+  // color_Linear = ambient_Color + lambertian * diffuse_Color * texture(ColorTex, texture_Coordinates).xyz + specular * specular_Color;
 
   // Cell-Shading-Model
   if (shader_Mode == 2) {

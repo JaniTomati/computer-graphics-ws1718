@@ -276,7 +276,7 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
 
 void ApplicationSolar::loadTextures() {
   // initialize textures
-  texture sun_texture {"sun", m_resource_path + "textures/2k_sun.tga"};
+  texture sun_texture {"sun", m_resource_path + "textures/sun2k.png"};
   texture earth_texture_day {"earth_day", m_resource_path + "textures/2k_earth_daymap.tga"};
   texture earth_texture_night {"earth_night", m_resource_path  + "textures/2k_earth_nightmap.tga"};
   texture venus_texture {"venus", m_resource_path + "textures/2k_venus_surface.tga"};
@@ -291,10 +291,12 @@ void ApplicationSolar::loadTextures() {
 
   // insert textures to m_texture_list
   std::vector<texture> texture_list;
-  texture_list.insert(texture_list.end(),{sun_texture, earth_texture_day,
-                        earth_texture_night, venus_texture, mars_texture, jupiter_texture,
-                        mercury_texture, saturn_texture, uranus_texture,
-                        neptune_texture, pluto_texture, moon_texture});
+  // texture_list.insert(texture_list.end(),{sun_texture, earth_texture_day,
+  //                       earth_texture_night, venus_texture, mars_texture, jupiter_texture,
+  //                       mercury_texture, saturn_texture, uranus_texture,
+  //                       neptune_texture, pluto_texture, moon_texture});
+
+  texture_list.insert(texture_list.end(), {sun_texture});
 
   // save loaded textures in map<name, pixel_data>
   for (auto const& texture : texture_list) {
@@ -385,7 +387,7 @@ void ApplicationSolar::initializeOrbit() {
 
 // load models
 void ApplicationSolar::initializeGeometry() {
-  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL);
+  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD);
 
   model star_model = model{m_star_list, (model::POSITION + model::NORMAL), {1}};
 
@@ -489,7 +491,7 @@ void ApplicationSolar::initializeTextures() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // 6. format Texture Object bound to the 2d binding point
     glTexImage2D(GL_TEXTURE_2D, 0, texture.second.channels, texture.second.width, texture.second.height, 0,
-                 texture.second.channels, texture.second.channel_type, &texture.second.pixels);
+                 texture.second.channels, texture.second.channel_type, texture.second.ptr());
   }
 }
 

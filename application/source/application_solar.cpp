@@ -167,6 +167,9 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * orbit.m_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
         model_matrix = glm::translate(model_matrix, glm::fvec3 {0.0f, 0.0f, -1.0f * orbit.m_distance_to_origin});
 
+        // self rotation
+        model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * orbit.m_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
+
         // transform moon planet
         model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
         normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
@@ -188,6 +191,10 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
   } else if (planet_instance.m_planet_type == _sun){
     // transform planet (where orbit planet is sun)
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
+
+    // self rotation
+    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * 0.1), glm::fvec3{0.0f, 1.0f, 0.0f});
+
     glUseProgram(m_shaders.at("sun").handle);
     glUniform1i(m_shaders.at("sun").u_locs.at("ShaderMode"), shader_Mode);
     glUniform3f(m_shaders.at("sun").u_locs.at("ColorVector"),
@@ -198,6 +205,10 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
   } else {
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
     normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+
+    // self rotation
+    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * planet_instance.m_rotation_speed * 10), glm::fvec3{0.0f, 1.0f, 0.0f});
+
     glUseProgram(m_shaders.at("planet").handle);
     glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), shader_Mode);
     glUniform3f(m_shaders.at("planet").u_locs.at("ColorVector"),

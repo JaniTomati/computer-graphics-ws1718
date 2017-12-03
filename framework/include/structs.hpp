@@ -57,7 +57,8 @@ struct shader_program {
 
 struct planet {
   planet(std::string const& name, float size, float rotation_speed,
-        float distance_to_origin, std::string const& orbit_origin, Planet_Type const& type, glm::vec3 const& color) :
+        float distance_to_origin, std::string const& orbit_origin,
+        Planet_Type const& type, glm::vec3 const& color, int texture_index) :
     m_name {name},
     m_size {float(size * 0.01f)},
     m_rotation_speed {float(rotation_speed * 0.001f)},
@@ -73,6 +74,7 @@ struct planet {
   std::string m_orbit_origin; // orbit planet
   Planet_Type m_planet_type;  // type of planet (_moon, _sun, _planet)
   glm::vec3 m_planet_color;
+  int m_texture_index;        // set planet texture index
 };
 
 struct texture {

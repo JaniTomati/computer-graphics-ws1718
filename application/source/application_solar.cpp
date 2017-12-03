@@ -168,7 +168,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         model_matrix = glm::translate(model_matrix, glm::fvec3 {0.0f, 0.0f, -1.0f * orbit.m_distance_to_origin});
 
         // self rotation
-        model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * orbit.m_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
+        model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * orbit.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
 
         // transform moon planet
         model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
@@ -193,7 +193,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
 
     // self rotation
-    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * 0.1), glm::fvec3{0.0f, 1.0f, 0.0f});
+    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * planet_instance.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
 
     glUseProgram(m_shaders.at("sun").handle);
     glUniform1i(m_shaders.at("sun").u_locs.at("ShaderMode"), shader_Mode);
@@ -207,7 +207,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
 
     // self rotation
-    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * planet_instance.m_rotation_speed * 10), glm::fvec3{0.0f, 1.0f, 0.0f});
+    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * planet_instance.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
 
     glUseProgram(m_shaders.at("planet").handle);
     glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), shader_Mode);
@@ -317,17 +317,17 @@ void ApplicationSolar::loadTextures() {
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
-  planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}, 0};
-  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1};
-  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2};
-  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3};
-  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4};
-  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5};
-  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6};
-  planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7};
-  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}, 8};
-  planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 9};
-  planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}, 10};
+  planet sun {"sun", 300.0f, 0.0f, 10.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}, 0};
+  planet earth {"earth", 12.756f, 365.2f, 23.9f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1};
+  planet mercury {"mercury", 4.879f, 88.0f, 1407.6f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2};
+  planet venus {"venus", 12.104f, 224.7f, -5832.5f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3};
+  planet mars {"mars", 6.792f, 687.0f, 24.6f, 2279.0f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4};
+  planet jupiter {"jupiter", 142.984f, 4331.0f, 9.9f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5};
+  planet saturn {"saturn", 120.536f, 10747.0f, 10.7f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6};
+  planet uranus {"uranus", 51.118f, 30589.0f, -17.2f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7};
+  planet neptune {"neptune", 49.528f, 59800.0f, 16.1f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}, 8};
+  planet pluto {"pluto", 2.370f, 90560.0f, -153.3f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 9};
+  planet moon {"moon", 3.475f, 27.3f*100.0f, 655.7f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}, 10};
 
   // insert planets
   m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,

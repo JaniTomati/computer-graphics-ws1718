@@ -277,17 +277,16 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
 void ApplicationSolar::loadTextures() {
   // initialize textures
   texture sun_texture {"sun", m_resource_path + "textures/sun2k.png"};
-  texture earth_texture_day {"earth_day", m_resource_path + "textures/2k_earth_daymap.tga"};
-  texture earth_texture_night {"earth_night", m_resource_path  + "textures/2k_earth_nightmap.tga"};
-  texture venus_texture {"venus", m_resource_path + "textures/2k_venus_surface.tga"};
-  texture mars_texture {"mars", m_resource_path + "textures/2k_mars.tga"};
-  texture jupiter_texture {"jupiter", m_resource_path + "textures/2k_jupiter.tga"};
-  texture mercury_texture {"mercury", m_resource_path + "textures/2k_mercury.tga"};
-  texture saturn_texture {"saturn", m_resource_path + "textures/2k_saturn.tga"};
-  texture uranus_texture {"uranus", m_resource_path + "textures/2k_uranus.tga"};
-  texture neptune_texture {"neptune", m_resource_path + "textures/2k_neptune.tga"};
-  texture pluto_texture {"pluto", m_resource_path + "textures/2k_pluto.tga"};
-  texture moon_texture {"moon", m_resource_path + "textures/2k_moon.tga"};
+  texture earth_texture_day {"earth_day", m_resource_path + "textures/earth2k.png"};
+  texture venus_texture {"venus", m_resource_path + "textures/venus2k.png"};
+  texture mars_texture {"mars", m_resource_path + "textures/mars2k.png"};
+  texture jupiter_texture {"jupiter", m_resource_path + "textures/jupiter2k.png"};
+  texture mercury_texture {"mercury", m_resource_path + "textures/mercury2k.png"};
+  texture saturn_texture {"saturn", m_resource_path + "textures/saturn2k.png"};
+  texture uranus_texture {"uranus", m_resource_path + "textures/uranus2k.png"};
+  texture neptune_texture {"neptune", m_resource_path + "textures/neptune2k.png"};
+  texture pluto_texture {"pluto", m_resource_path + "textures/pluto2k.png"};
+  texture moon_texture {"moon", m_resource_path + "textures/moon2k.png"};
 
   // insert textures to m_texture_list
   std::vector<texture> texture_list;

@@ -3,7 +3,7 @@
 
 // vertex attributes of VAO
 layout(location = 0) in vec3 in_Position;
-layout(location = 2) in vec2 in_Texture_Coordinates;
+layout(location = 1) in vec2 in_Texture_Coordinates;
 
 //Matrix Uniforms as specified with glUniformMatrix4fv
 uniform mat4 ViewMatrix;

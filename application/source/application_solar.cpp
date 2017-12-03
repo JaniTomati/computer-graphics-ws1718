@@ -525,7 +525,7 @@ void ApplicationSolar::initializeTextures() {
 
         for (int j = 0; j < 6; ++j) {
           glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, m_loaded_textures[i].channels, m_loaded_textures[i].width, m_loaded_textures[i].height, 0,
-            m_loaded_textures[i].channels, m_loaded_textures[i].channels, m_loaded_textures[i].ptr());
+            m_loaded_textures[i].channels, m_loaded_textures[i].channel_type, m_loaded_textures[i].ptr());
         }
       }
     }

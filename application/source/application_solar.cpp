@@ -28,7 +28,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,m_star_list{}
  ,orbit_object{}
  ,m_orbit_list{}
- ,texture_object{}
+ ,tex_object{}
  ,m_loaded_textures{}
  ,shader_Mode{}
 {
@@ -61,7 +61,7 @@ void ApplicationSolar::render() const {
     // activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // bind Texture Object to 2d texture binding point of unit
-    glBindTexture(GL_TEXTURE_2D, texture_object.handle);
+    glBindTexture(GL_TEXTURE_2D, tex_object.handle);
 
     // calculates model- and normal-matrix
     uploadPlanetTransforms(planet);
@@ -479,9 +479,9 @@ void ApplicationSolar::initializeTextures() {
     // 1. activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // 2. generate texture object
-    glGenTextures(1, &texture_object.handle);
+    glGenTextures(1, &tex_object.handle);
     // 3. bind Texture Object to 2d texture binding point of unit
-    glBindTexture(GL_TEXTURE_2D, texture_object.handle);
+    glBindTexture(GL_TEXTURE_2D, tex_object.handle);
     // 4. define interpolation type when fragment covers multiple texels (texture pixels)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // 5. define interpolation type when fragment does not exactly cover one texel

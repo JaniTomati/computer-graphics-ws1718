@@ -53,7 +53,7 @@ class ApplicationSolar : public Application {
   model_object orbit_object;
   std::vector<GLfloat> m_orbit_list;
 
-  texture_object texture_object;
+  texture_object tex_object;
   std::map<std::string, pixel_data> m_loaded_textures;
 
   int shader_Mode = 1;

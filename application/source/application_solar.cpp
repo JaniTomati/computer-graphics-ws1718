@@ -61,7 +61,7 @@ void ApplicationSolar::render() const {
     // activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // bind Texture Object to 2d texture binding point of unit
-    glBindTexture(GL_TEXTURE_2D, tex_object.handle);
+    glBindTexture(GL_TEXTURE_2D, m_texture_objects[planet.m_texture_index].handle);
 
     // calculates model- and normal-matrix
     uploadPlanetTransforms(planet);
@@ -277,11 +277,11 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
 void ApplicationSolar::loadTextures() {
   // initialize textures
   texture sun_texture {"sun", m_resource_path + "textures/sun2k.png"};
-  texture earth_texture_day {"earth_day", m_resource_path + "textures/earth2k.png"};
+  texture earth_texture {"earth", m_resource_path + "textures/earth2k.png"};
+  texture mercury_texture {"mercury", m_resource_path + "textures/mercury2k.png"};
   texture venus_texture {"venus", m_resource_path + "textures/venus2k.png"};
   texture mars_texture {"mars", m_resource_path + "textures/mars2k.png"};
   texture jupiter_texture {"jupiter", m_resource_path + "textures/jupiter2k.png"};
-  texture mercury_texture {"mercury", m_resource_path + "textures/mercury2k.png"};
   texture saturn_texture {"saturn", m_resource_path + "textures/saturn2k.png"};
   texture uranus_texture {"uranus", m_resource_path + "textures/uranus2k.png"};
   texture neptune_texture {"neptune", m_resource_path + "textures/neptune2k.png"};
@@ -290,37 +290,33 @@ void ApplicationSolar::loadTextures() {
 
   // insert textures to m_texture_list
   std::vector<texture> texture_list;
-  // texture_list.insert(texture_list.end(),{sun_texture, earth_texture_day,
-  //                       earth_texture_night, venus_texture, mars_texture, jupiter_texture,
-  //                       mercury_texture, saturn_texture, uranus_texture,
-  //                       neptune_texture, pluto_texture, moon_texture});
-
-  texture_list.insert(texture_list.end(), {sun_texture});
+  texture_list.insert(texture_list.end(),{sun_texture, earth_texture,
+                      venus_texture, mars_texture, jupiter_texture,
+                      mercury_texture, saturn_texture, uranus_texture,
+                      neptune_texture, pluto_texture, moon_texture});
 
   // save loaded textures in map<name, pixel_data>
   for (auto const& texture : texture_list) {
-    pixel_data loaded_pixel_data = texture_loader::file(texture.m_file_path);
-    std::pair<std::string, pixel_data> loaded_texture = std::make_pair(texture.m_name, loaded_pixel_data);
-
-    std::cout << "Load " << loaded_texture.first << " texture!" << std::endl;
-    m_loaded_textures.insert(loaded_texture);
+    pixel_data loaded_texture = texture_loader::file(texture.m_file_path);
+    std::cout << "Load " << texture.m_name << " texture!" << std::endl;
+    m_loaded_textures.push_back(loaded_texture);
   }
 }
 
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
-  planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}};
-  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}};
-  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}};
-  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}};
-  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}};
-  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}};
-  planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}};
-  planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}};
-  planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}};
+  planet sun {"sun", 300.0f, 0.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}, 0};
+  planet earth {"earth", 12.756f, 365.2f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1};
+  planet mercury {"mercury", 4.879f, 88.0f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2};
+  planet venus {"venus", 12.104f, 224.7f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3};
+  planet mars {"mars", 6.792f, 687.0f, 2279.0f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4};
+  planet jupiter {"jupiter", 142.984f, 4331.0f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5};
+  planet saturn {"saturn", 120.536f, 10747.0f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6};
+  planet uranus {"uranus", 51.118f, 30589.0f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7};
+  planet neptune {"neptune", 49.528f, 59800.0f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}, 8};
+  planet pluto {"pluto", 2.370f, 90560.0f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 9};
+  planet moon {"moon", 3.475f, 27.3f*100.0f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}, 10};
 
   // insert planets
   m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,
@@ -472,9 +468,10 @@ void ApplicationSolar::initializeGeometry() {
 void ApplicationSolar::initializeTextures() {
   // load textures using texture loader
   loadTextures();
+  int num_planets = m_planet_list.size();
 
   // Texture specification
-  for (auto const& texture : m_loaded_textures) {
+  for (int i = 0; i < num_planets; ++i) {
     // 1. activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // 2. generate texture object
@@ -489,8 +486,10 @@ void ApplicationSolar::initializeTextures() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // 6. format Texture Object bound to the 2d binding point
-    glTexImage2D(GL_TEXTURE_2D, 0, texture.second.channels, texture.second.width, texture.second.height, 0,
-                 texture.second.channels, texture.second.channel_type, texture.second.ptr());
+    glTexImage2D(GL_TEXTURE_2D, 0, m_loaded_textures[i].channels, m_loaded_textures[i].width, m_loaded_textures[i].height, 0,
+                 m_loaded_textures[i].channels, m_loaded_textures[i].channel_type, m_loaded_textures[i].ptr());
+
+    m_texture_objects.push_back(tex_object);
   }
 }
 

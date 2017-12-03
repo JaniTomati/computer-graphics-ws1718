@@ -65,7 +65,8 @@ struct planet {
     m_distance_to_origin {float(distance_to_origin * 0.01f)},
     m_orbit_origin {orbit_origin},
     m_planet_type {type},
-    m_planet_color {color} {}
+    m_planet_color {color},
+    m_texture_index {texture_index} {}
 
   std::string m_name;
   float m_size;

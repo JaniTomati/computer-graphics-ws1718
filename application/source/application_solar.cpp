@@ -298,13 +298,13 @@ void ApplicationSolar::loadTextures() {
   texture neptune_texture {"neptune", m_resource_path + "textures/neptune2k.png"};
   texture pluto_texture {"pluto", m_resource_path + "textures/pluto2k.png"};
   texture moon_texture {"moon", m_resource_path + "textures/moon2k.png"};
+  texture skybox_texture {"skybox", m_resource_path + "textures/skybox2k.png"};
 
   // insert textures to m_texture_list
-  std::vector<texture> texture_list;
   texture_list.insert(texture_list.end(),{sun_texture, earth_texture,
                       venus_texture, mars_texture, jupiter_texture,
                       mercury_texture, saturn_texture, uranus_texture,
-                      neptune_texture, pluto_texture, moon_texture});
+                      neptune_texture, pluto_texture, moon_texture, skybox_texture});
 
   // save loaded textures in map<name, pixel_data>
   for (auto const& texture : texture_list) {
@@ -481,8 +481,9 @@ void ApplicationSolar::initializeTextures() {
   loadTextures();
   int num_planets = m_planet_list.size();
 
+
   // Texture specification
-  for (int i = 0; i < num_planets; ++i) {
+  for (int i = 0; i < texture_list.size(); ++i) {
     // 1. activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // 2. generate texture object
@@ -501,7 +502,36 @@ void ApplicationSolar::initializeTextures() {
                  m_loaded_textures[i].channels, m_loaded_textures[i].channel_type, m_loaded_textures[i].ptr());
 
     m_texture_objects.push_back(tex_object);
-  }
+
+    if (texture_list[i].m_name == "skybox") {
+      // 1. activate Texture Unit to which to bind texture
+      glActiveTexture(GL_TEXTURE0);
+      // 2. enables Texture Cube Map
+      glEnable(GL_TEXTURE_CUBE_MAP);
+      // 3. generate Texture Object
+      glGenTextures(1, &tex_object.handle);
+      // 4. bind Texture Object to 2d texture binding point of unit
+      glBindTexture(GL_TEXTURE_CUBE_MAP, tex_object.handle);
+
+      //for(int i = 0; i < 6; ++i) {
+        // 5. set the wrap parameter for texture coordinate s, t, r
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+
+        for (int j = 0; j < 6; ++j) {
+          glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, m_loaded_textures[i].channels, m_loaded_textures[i].width, m_loaded_textures[i].height, 0,
+            m_loaded_textures[i].channels, m_loaded_textures[i].channels, m_loaded_textures[i].ptr());
+        }
+      }
+    }
+//17c. load the image data into the current bound texture buffer
+//cubeMapTarget[] contains the cube map targets
+// glTexImage2D(cubeMapTarget[i], 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
 }
 
 // deconstruct everything

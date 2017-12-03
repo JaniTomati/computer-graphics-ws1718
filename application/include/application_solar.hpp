@@ -58,6 +58,8 @@ class ApplicationSolar : public Application {
 
   std::vector<texture_object> m_texture_objects;
 
+  std::vector<texture> texture_list;
+
   int shader_Mode = 1;
 };
 

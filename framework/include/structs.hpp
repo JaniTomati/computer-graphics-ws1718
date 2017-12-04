@@ -62,7 +62,7 @@ struct planet {
     m_name {name},
     m_size {float(size * 0.01f)},
     m_rotation_speed {float(rotation_speed * 0.001f)},
-    m_self_rotation_speed {float(self_rotation_speed * 0.01f)},
+    m_self_rotation_speed {float(self_rotation_speed * 0.1f)},
     m_distance_to_origin {float(distance_to_origin * 0.01f)},
     m_orbit_origin {orbit_origin},
     m_planet_type {type},

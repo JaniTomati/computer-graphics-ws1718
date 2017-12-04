@@ -42,6 +42,7 @@ class ApplicationSolar : public Application {
   void initializeShaderPrograms();
   void initializeGeometry();
   void initializeTextures();
+  void initializeSkybox();
   void updateView();
 
   model_object planet_object; // cpu representation of model
@@ -56,7 +57,11 @@ class ApplicationSolar : public Application {
   texture_object tex_object;
   std::vector<pixel_data> m_loaded_textures;
 
+  model_object skybox_object;
+  std::vector<glm::vec3> skybox_coordinates;
+
   std::vector<texture_object> m_texture_objects;
+  texture_object m_texture_objects_skybox;
 
   std::vector<texture> texture_list;
 

@@ -1,11 +1,11 @@
 #version 150
 
-in vec2 texture_Coordinates;
+in vec3 eyeDir;
 
 uniform samplerCube cube_Map;
 
 out vec4 out_Color;
 
 void main() {
-  out_Color = texture(cube_Map, texture_Coordinates);
+  out_Color = texture(cube_Map, eyeDir);
 }

@@ -323,21 +323,21 @@ void ApplicationSolar::loadTextures() {
   texture neptune_texture {"neptune", m_resource_path + "textures/neptune2k.png"};
   texture pluto_texture {"pluto", m_resource_path + "textures/pluto2k.png"};
   texture moon_texture {"moon", m_resource_path + "textures/moon2k.png"};
-  texture skybox_texture_bottom {"skybox", m_resource_path + "textures/skybox_bottom.png"};
-  texture skybox_texture_top {"skybox", m_resource_path + "textures/skybox_top.png"};
-  texture skybox_texture_front {"skybox", m_resource_path + "textures/skybox_front.png"};
-  texture skybox_texture_back {"skybox", m_resource_path + "textures/skybox_back.png"};
-  texture skybox_texture_left {"skybox", m_resource_path + "textures/skybox_left.png"};
   texture skybox_texture_right {"skybox", m_resource_path + "textures/skybox_right.png"};
+  texture skybox_texture_left {"skybox", m_resource_path + "textures/skybox_left.png"};
+  texture skybox_texture_top {"skybox", m_resource_path + "textures/skybox_top.png"};
+  texture skybox_texture_bottom {"skybox", m_resource_path + "textures/skybox_bottom.png"};
+  texture skybox_texture_back {"skybox", m_resource_path + "textures/skybox_back.png"};
+  texture skybox_texture_front {"skybox", m_resource_path + "textures/skybox_front.png"};
 
   // insert textures to m_texture_list
   texture_list.insert(texture_list.end(),{sun_texture, earth_texture,
                       venus_texture, mars_texture, jupiter_texture,
                       mercury_texture, saturn_texture, uranus_texture,
                       neptune_texture, pluto_texture, moon_texture,
+                      skybox_texture_right, skybox_texture_left,
                       skybox_texture_bottom, skybox_texture_top,
-                      skybox_texture_front, skybox_texture_back,
-                      skybox_texture_left, skybox_texture_right});
+                      skybox_texture_front, skybox_texture_back});
 
   // save loaded textures in map<name, pixel_data>
   for (auto const& texture : texture_list) {

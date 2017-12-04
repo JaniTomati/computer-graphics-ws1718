@@ -8,16 +8,13 @@ layout(location = 0) in vec4 in_Position;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
-out vec3 eyeDir;
+out vec3 view_Direction;
 
 void main(void)
 {
-	mat4 inverseProjection = inverse(ProjectionMatrix);
-	mat3 inverseModelview = transpose(mat3(ViewMatrix));
-	vec3 unprojected = (inverseProjection * in_Position).xyz;
-	eyeDir = inverseModelview * unprojected;
+	mat4 inverse_Projection_Matrix = inverse(ProjectionMatrix);
+	mat3 transposed_View_Matrix = transpose(mat3(ViewMatrix));
+	vec3 unprojected = (inverse_Projection_Matrix * in_Position).xyz;
+	view_Direction = transposed_View_Matrix * unprojected;
 	gl_Position = in_Position;
-
-	// gl_Position = (ProjectionMatrix * ViewMatrix) * vec4(in_Position, 1.0);
-	// texture_Coordinates = in_Position;
 }

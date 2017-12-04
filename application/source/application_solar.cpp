@@ -37,7 +37,7 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,skybox_coordinates{}
 {
   initializePlanets();
-  initializeStars(50000);
+  initializeStars(10000);
   initializeOrbit();
   initializeShaderPrograms();
   initializeGeometry();
@@ -46,11 +46,6 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 }
 
 void ApplicationSolar::render() const {
-  // render Stars
-  glBindVertexArray(star_object.vertex_AO);
-  glUseProgram(m_shaders.at("star").handle);
-  //glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
-  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements);
 
   glDepthMask(GL_FALSE);
   glUseProgram(m_shaders.at("skybox").handle);
@@ -60,6 +55,12 @@ void ApplicationSolar::render() const {
   glBindVertexArray(skybox_object.vertex_AO);
   glDrawElements(skybox_object.draw_mode, skybox_object.num_elements, model::INDEX.type, NULL);
   glDepthMask(GL_TRUE);
+
+  // render Stars
+  glBindVertexArray(star_object.vertex_AO);
+  glUseProgram(m_shaders.at("star").handle);
+  //glDrawElements(star_object.draw_mode, star_object.num_elements, model::INDEX.type, NULL);
+  glDrawArrays(star_object.draw_mode, 0, star_object.num_elements);
 
   // bind shader to upload uniforms
   glUseProgram(m_shaders.at("planet").handle);
@@ -335,9 +336,9 @@ void ApplicationSolar::loadTextures() {
                       venus_texture, mars_texture, jupiter_texture,
                       mercury_texture, saturn_texture, uranus_texture,
                       neptune_texture, pluto_texture, moon_texture,
-                      skybox_texture_right, skybox_texture_left,
+                      skybox_texture_right, skybox_texture_front,
                       skybox_texture_bottom, skybox_texture_top,
-                      skybox_texture_front, skybox_texture_back});
+                      skybox_texture_left, skybox_texture_back});
 
   // save loaded textures in map<name, pixel_data>
   for (auto const& texture : texture_list) {

@@ -298,7 +298,7 @@ void ApplicationSolar::loadTextures() {
   texture neptune_texture {"neptune", m_resource_path + "textures/neptune2k.png"};
   texture pluto_texture {"pluto", m_resource_path + "textures/pluto2k.png"};
   texture moon_texture {"moon", m_resource_path + "textures/moon2k.png"};
-  texture skybox_texture {"skybox", m_resource_path + "textures/skybox2k.png"};
+  texture skybox_texture {"skybox", m_resource_path + "textures/skybox_fix.png"};
 
   // insert textures to m_texture_list
   texture_list.insert(texture_list.end(),{sun_texture, earth_texture,

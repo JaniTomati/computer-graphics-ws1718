@@ -207,10 +207,10 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
         glUniform1i(m_shaders.at("planet").u_locs.at("ColorTex"), 0);
-
+        glUniform1i(m_shaders.at("planet").u_locs.at("NormalTex"), 0);
         // extra matrix for normal transformation to keep them orthogonal to surface
-        // glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-        //                   1, GL_FALSE, glm::value_ptr(normal_matrix));
+        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                           1, GL_FALSE, glm::value_ptr(normal_matrix));
         break;
       }
     }
@@ -312,7 +312,7 @@ void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
 }
 
 void ApplicationSolar::loadTextures() {
-  // initialize textures
+  // initialize planet textures (order like planet initialization!)
   texture sun_texture {"sun", m_resource_path + "textures/sun2k.png"};
   texture earth_texture {"earth", m_resource_path + "textures/earth2k.png"};
   texture mercury_texture {"mercury", m_resource_path + "textures/mercury2k.png"};
@@ -324,6 +324,8 @@ void ApplicationSolar::loadTextures() {
   texture neptune_texture {"neptune", m_resource_path + "textures/neptune2k.png"};
   texture pluto_texture {"pluto", m_resource_path + "textures/pluto2k.png"};
   texture moon_texture {"moon", m_resource_path + "textures/moon2k.png"};
+
+  // initialize skybox textures
   texture skybox_texture_right {"skybox", m_resource_path + "textures/skybox_right.png"};
   texture skybox_texture_left {"skybox", m_resource_path + "textures/skybox_left.png"};
   texture skybox_texture_top {"skybox", m_resource_path + "textures/skybox_top.png"};
@@ -331,6 +333,10 @@ void ApplicationSolar::loadTextures() {
   texture skybox_texture_back {"skybox", m_resource_path + "textures/skybox_back.png"};
   texture skybox_texture_front {"skybox", m_resource_path + "textures/skybox_front.png"};
 
+  // normal mapping textures
+  texture earth_normal_mapping {"eart_normal", m_resource_path + "textures/earth_normal_map2k.png"};
+
+  std::vector<texture> texture_list;
   // insert textures to m_texture_list
   texture_list.insert(texture_list.end(),{sun_texture, earth_texture,
                       venus_texture, mars_texture, jupiter_texture,
@@ -340,28 +346,39 @@ void ApplicationSolar::loadTextures() {
                       skybox_texture_bottom, skybox_texture_top,
                       skybox_texture_left, skybox_texture_back});
 
-  // save loaded textures in map<name, pixel_data>
+  std::vector<texture> normal_map_list;
+  normal_map_list.insert(normal_map_list.end(), {earth_normal_mapping});
+
+  // save loaded textures in vector
   for (auto const& texture : texture_list) {
     pixel_data loaded_texture = texture_loader::file(texture.m_file_path);
     std::cout << "Load " << texture.m_name << " texture!" << std::endl;
     m_loaded_textures.push_back(loaded_texture);
+  }
+
+  // save loaded normal maps in vector
+  for (auto const& texture : normal_map_list) {
+    pixel_data loaded_texture = texture_loader::file(texture.m_file_path);
+    std::cout << "Load " << texture.m_name << " texture!" << std::endl;
+    m_loaded_normal_mappings.push_back(loaded_texture);
   }
 }
 
 // fill planet list
 void ApplicationSolar::initializePlanets() {
   // initialize planets
-  planet sun {"sun", 300.0f, 0.0f, 10.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}, 0};
-  planet earth {"earth", 12.756f, 365.2f, 23.9f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1};
-  planet mercury {"mercury", 4.879f, 88.0f, 140.76f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2};
-  planet venus {"venus", 12.104f, 224.7f, -583.25f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3};
-  planet mars {"mars", 6.792f, 687.0f, 24.6f, 227.90f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4};
-  planet jupiter {"jupiter", 142.984f, 4331.0f, 9.9f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5};
-  planet saturn {"saturn", 120.536f, 10747.0f, 10.7f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6};
-  planet uranus {"uranus", 51.118f, 30589.0f, -17.2f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7};
-  planet neptune {"neptune", 49.528f, 59800.0f, 16.1f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}, 8};
-  planet pluto {"pluto", 2.370f, 90560.0f, -153.3f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 9};
-  planet moon {"moon", 3.475f, 27.3f*100.0f, 655.7f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}, 10};
+  // name, size, rotation speed, self rotation speed, distance to origin, orbit origin, planet type, color, texture index
+  planet sun {"sun", 300.0f, 0.0f, 10.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}, 0, 0};
+  planet earth {"earth", 12.756f, 365.2f, 23.9f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1, 0};
+  planet mercury {"mercury", 4.879f, 88.0f, 140.76f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2, 0};
+  planet venus {"venus", 12.104f, 224.7f, -583.25f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3, 0};
+  planet mars {"mars", 6.792f, 687.0f, 24.6f, 227.90f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4, 0};
+  planet jupiter {"jupiter", 142.984f, 4331.0f, 9.9f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5, 0};
+  planet saturn {"saturn", 120.536f, 10747.0f, 10.7f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6, 0};
+  planet uranus {"uranus", 51.118f, 30589.0f, -17.2f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7, 0};
+  planet neptune {"neptune", 49.528f, 59.0f, 16.1f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}, 8, 0};
+  planet pluto {"pluto", 2.370f, 90560.0f, -153.3f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 9, 0};
+  planet moon {"moon", 3.475f, 27.3f*100.0f, 655.7f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}, 10, 0};
 
   // insert planets
   m_planet_list.insert(m_planet_list.end(),{sun, earth, mercury, venus, mars,
@@ -384,10 +401,12 @@ void ApplicationSolar::initializeShaderPrograms() {
   // m_shaders.at("planet").u_locs["NormalMatrix"] = -1;
   m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
   m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
+  m_shaders.at("planet").u_locs["NormalMatrix"] = -1;
   m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
   m_shaders.at("planet").u_locs["ColorVector"] = -1;
   m_shaders.at("planet").u_locs["ShaderMode"] = -1;
   m_shaders.at("planet").u_locs["ColorTex"] = -1;
+  m_shaders.at("planet").u_locs["NormalTex"] = -1;
 
   // store shader program objects in container
   m_shaders.emplace("sun", shader_program{m_resource_path + "shaders/sun.vert",
@@ -434,7 +453,7 @@ void ApplicationSolar::initializeOrbit() {
 
 // load models
 void ApplicationSolar::initializeGeometry() {
-  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD);
+  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD | model::TANGENT);
 
   model star_model = model{m_star_list, (model::POSITION + model::NORMAL), {1}};
 
@@ -462,8 +481,13 @@ void ApplicationSolar::initializeGeometry() {
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
   // activate third attribute on gpu
   glEnableVertexAttribArray(2);
-  // third attribute 3 is 3 floats with no offset & stride
+  // third attribute is 3 floats with no offset & stride
   glVertexAttribPointer(2, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TEXCOORD]);
+  // activate fourth attribute on gpu (normal mapping)
+  glEnableVertexAttribArray(3);
+  // fourth attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(3, model::TANGENT.components, model::TANGENT.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::TANGENT]);
+
 
   // generate generic buffer
   glGenBuffers(1, &planet_object.element_BO);
@@ -520,8 +544,8 @@ void ApplicationSolar::initializeGeometry() {
 void ApplicationSolar::initializeTextures() {
   // load textures using texture loader
   loadTextures();
-  int num_planets = m_planet_list.size();
 
+  int num_planets = m_planet_list.size();
 
   // Texture specification
   for (int i = 0; i < num_planets; ++i) {
@@ -544,6 +568,31 @@ void ApplicationSolar::initializeTextures() {
 
     m_texture_objects.push_back(tex_object);
   }
+
+  int num_normal_mappings = m_loaded_normal_mappings.size();
+
+  // Normal mapping specification
+  for (int i = 0; i < num_normal_mappings; ++i) {
+    // 1. activate Texture Unit to which to bind texture
+    glActiveTexture(GL_TEXTURE0 + 1);
+    // 2. generate texture object
+    glGenTextures(1, &tex_object_normal.handle);
+    // 3. bind Texture Object to 2d texture binding point of unit
+    glBindTexture(GL_TEXTURE_2D, tex_object_normal.handle);
+    // 4. define interpolation type when fragment covers multiple texels (texture pixels)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // 5. define interpolation type when fragment does not exactly cover one texel
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // set the wrap parameter for texture coordinate s and t
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    // 6. format Texture Object bound to the 2d binding point
+    glTexImage2D(GL_TEXTURE_2D, 0, m_loaded_normal_mappings[i].channels,  m_loaded_normal_mappings[i].width,  m_loaded_normal_mappings[i].height, 0,
+                  m_loaded_normal_mappings[i].channels,  m_loaded_normal_mappings[i].channel_type,  m_loaded_normal_mappings[i].ptr());
+
+    m_texture_objects.push_back(tex_object_normal);
+  }
+
   // 1. activate Texture Unit to which to bind texture
   glActiveTexture(GL_TEXTURE0);
   // 2. enables Texture Cube Map
@@ -564,8 +613,8 @@ void ApplicationSolar::initializeTextures() {
 
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, m_loaded_textures[num_planets].channels, m_loaded_textures[num_planets].width, m_loaded_textures[num_planets].height, 0,
     m_loaded_textures[num_planets].channels, m_loaded_textures[num_planets].channel_type, m_loaded_textures[num_planets].ptr());
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, m_loaded_textures[num_planets + 1].channels, m_loaded_textures[num_planets + 1].width, m_loaded_textures[num_planets + 1].height, 0,
-      m_loaded_textures[num_planets + 1].channels, m_loaded_textures[num_planets + 1].channel_type, m_loaded_textures[num_planets + 1].ptr());
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, m_loaded_textures[num_planets + 1].channels, m_loaded_textures[num_planets + 1].width, m_loaded_textures[num_planets + 1].height, 0,
+    m_loaded_textures[num_planets + 1].channels, m_loaded_textures[num_planets + 1].channel_type, m_loaded_textures[num_planets + 1].ptr());
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, m_loaded_textures[num_planets + 2].channels, m_loaded_textures[num_planets + 2].width, m_loaded_textures[num_planets + 2].height, 0,
     m_loaded_textures[num_planets + 2].channels, m_loaded_textures[num_planets + 2].channel_type, m_loaded_textures[num_planets + 2].ptr());
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, m_loaded_textures[num_planets + 3].channels, m_loaded_textures[num_planets + 3].width, m_loaded_textures[num_planets + 3].height, 0,

@@ -57,13 +57,14 @@ class ApplicationSolar : public Application {
   texture_object tex_object;
   std::vector<pixel_data> m_loaded_textures;
 
+  texture_object tex_object_normal;
+  std::vector<pixel_data> m_loaded_normal_mappings;
+
   model_object skybox_object;
   std::vector<glm::vec3> skybox_coordinates;
 
   std::vector<texture_object> m_texture_objects;
   texture_object m_texture_objects_skybox;
-
-  std::vector<texture> texture_list;
 
   int shader_Mode = 1;
 };

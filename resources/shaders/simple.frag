@@ -2,12 +2,14 @@
 
 in vec3 pass_Normal;
 in vec3 pass_Normal_View;
+in vec3 pass_Tangent;
 in vec3 vertex_Position;
 in vec3 vertex_Position_World;
 in vec3 planet_Color;
 in vec2 texture_Coordinates;
 
 uniform sampler2D ColorTex;
+uniform sampler2D NormalTex;
 
 flat in int shader_Mode;
 
@@ -27,9 +29,16 @@ const float shininess = 16.0;
 const float screen_Gamma = 2.2;
 
 void main() {
+  // normal mapping
+  vec3 normal_Mapping = 2 * texture(NormalTex, texture_Coordinates).rgb - 1.0f;
+  vec3 bi_Tangent = cross(pass_Normal, pass_Tangent);
+  mat3 TangentMatrix = mat3(pass_Tangent, bi_Tangent, pass_Normal);
+
+  vec3 normal = normalize(TangentMatrix * normal_Mapping);
+
   // Blinn-Phong-Model
-  vec3 N  = normalize(pass_Normal); // normal
-  vec3 NV = normalize(pass_Normal_View); // normal view
+  vec3 N  = normalize(normal); // normal
+  vec3 NV = normalize(normal); // normal view
   vec3 L  = normalize(light_Position - vertex_Position); // light direction
   vec3 V  = normalize(-vertex_Position); // view direction
   vec3 H  = normalize(L + V); // halfway vector

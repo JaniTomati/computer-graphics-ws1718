@@ -547,7 +547,7 @@ void ApplicationSolar::initializeTextures() {
   // 1. activate Texture Unit to which to bind texture
   glActiveTexture(GL_TEXTURE0);
   // 2. enables Texture Cube Map
-  glEnable(GL_TEXTURE_CUBE_MAP);
+  //glEnable(GL_TEXTURE_CUBE_MAP);
   // 3. generate Texture Object
   glGenTextures(1, &m_texture_objects_skybox.handle);
   // 4. bind Texture Object to gl texture cube map binding point of unit

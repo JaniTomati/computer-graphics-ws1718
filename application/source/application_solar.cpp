@@ -85,9 +85,6 @@ void ApplicationSolar::render() const {
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
   }
-
-
-
 }
 
 void ApplicationSolar::updateView() {
@@ -242,6 +239,8 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
     glUniform1i(m_shaders.at("planet").u_locs.at("ColorTex"), 0);
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                       1, GL_FALSE, glm::value_ptr(normal_matrix));
 
 
     // extra matrix for normal transformation to keep them orthogonal to surface
@@ -292,11 +291,16 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
     shader_Mode = 2;
     updateView();
   }
-
 }
 
 // handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_y, double pos_x) {
+
+  // mouse handling
+  // m_view_transform = glm::rotate(m_view_transform, float(pos_x)/100, glm::fvec3{0.0f, -1.0f, 0.0f});
+  // m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, float(pos_y)/100.0f, 0.0f});
+  // updateView();
+
   // mouse handling
   m_view_transform = glm::rotate(m_view_transform, -0.025f, glm::fvec3{pos_x, pos_y, 0.0f});
   updateView();
@@ -334,7 +338,7 @@ void ApplicationSolar::loadTextures() {
   texture skybox_texture_front {"skybox", m_resource_path + "textures/skybox_front.png"};
 
   // normal mapping textures
-  texture earth_normal_mapping {"eart_normal", m_resource_path + "textures/earth_normal_map2k.png"};
+  texture earth_normal_mapping {"earth_normal", m_resource_path + "textures/earth_normal_map2k.png"};
 
   std::vector<texture> texture_list;
   // insert textures to m_texture_list

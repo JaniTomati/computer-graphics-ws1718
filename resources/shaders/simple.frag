@@ -1,12 +1,14 @@
 #version 150
 
 in vec3 pass_Normal;
-in vec3 pass_Normal_View;
+in vec3 pass_Normal_View; //opt
 in vec3 pass_Tangent;
 in vec3 vertex_Position;
-in vec3 vertex_Position_World;
+in vec3 vertex_Position_View;
 in vec3 planet_Color;
 in vec2 texture_Coordinates;
+in vec3 vertex_Position_Cam;
+in vec3 light_Position;
 
 uniform sampler2D ColorTex;
 uniform sampler2D NormalTex;
@@ -17,37 +19,39 @@ out vec4 out_Color;
 
 // switch between viewing-modi
 
-const vec3 light_Position = vec3(0.0, 0.0, 0.0);
+// const vec3 light_Position = vec3(0.0, 0.0, 0.0);
 const vec3 specular_Color = vec3(1.0, 1.0, 1.0); // color of the specular highlights
-const vec3 ambient_Color = vec3(0.01, 0.01, 0.01);  // indirect light coming from sourroundings
-const vec3 diffuse_Color = vec3(0.5, 0.5, 0.5);  // diffusely reflected light from surface microfacets
+// const vec3 ambient_Color = vec3(0.01, 0.01, 0.01);  // indirect light coming from sourroundings
+vec3 ambient_Color = vec3(texture(ColorTex, texture_Coordinates)).xyz * 0.01;  // indirect light coming from sourroundings
+// const vec3 diffuse_Color = vec3(0.5, 0.5, 0.5);  // diffusely reflected light from surface microfacets
+vec3 diffuse_Color = vec3(texture(ColorTex, texture_Coordinates)).xyz;  // diffusely reflected light from surface microfacets
 // const float sun_Intensity = 1.0;
 // const float ambient_Intensity = 0.01;
 // const float diffuse_Intensity = 0.5;
 // const float specular_Intensity = 1.0;
 const float shininess = 16.0;
 const float screen_Gamma = 2.2;
+vec3 normal_Mapping = 2 * texture(NormalTex, texture_Coordinates).rgb - 1.0f;
 
 void main() {
   // normal mapping
-  vec3 normal_Mapping = 2 * texture(NormalTex, texture_Coordinates).rgb - 1.0f;
   vec3 bi_Tangent = cross(pass_Normal, pass_Tangent);
   mat3 TangentMatrix = mat3(pass_Tangent, bi_Tangent, pass_Normal);
-
-  vec3 normal = normalize(TangentMatrix * normal_Mapping);
-
-  // Blinn-Phong-Model
-  vec3 N  = normalize(normal); // normal
-  vec3 NV = normalize(normal); // normal view
+  vec3 normal = normalize(TangentMatrix * normal_Mapping); // detail normal
+  // vec3 N  = normalize(normal); // normal
+  // vec3 NV = normalize(pass_Normal_View); // normal view
   vec3 L  = normalize(light_Position - vertex_Position); // light direction
   vec3 V  = normalize(-vertex_Position); // view direction
+
+
+  // Blinn-Phong-Model
+  float lambertian = max(dot(L, normal), 0.0); // diffuse reflectance
+
   vec3 H  = normalize(L + V); // halfway vector
 
-  float lambertian = max(dot(L, N), 0.0); // diffuse reflectance
+  float specular_Angle = max(dot(H, normal), 0.0); // rho
   float specular = 0.0; // reflection of light directly to viewer
-  float specular_Angle = max(dot(H, N), 0.0); // rho
 
-  vec3 color_Linear;
 
   // calculate specular reflection if the surface is oriented to the light source
   if(lambertian > 0.0) {
@@ -56,11 +60,11 @@ void main() {
 
   // calculate planet color
   // color_Linear = ambient_Color + lambertian * diffuse_Color * vec3(planet_Color).xyz + specular * specular_Color;
-  color_Linear = ambient_Color + lambertian * diffuse_Color * texture(ColorTex, texture_Coordinates).xyz + specular * specular_Color;
+  vec3 color_Linear = ambient_Color + lambertian * diffuse_Color + specular * specular_Color;
 
   // Cell-Shading-Model
   if (shader_Mode == 2) {
-    float normal_View_Angle = dot(-normalize(vertex_Position_World), NV);
+    float normal_View_Angle = dot(-normalize(vertex_Position), normal);
 
     specular = pow(specular_Angle, shininess * 10);
 

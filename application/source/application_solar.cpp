@@ -453,7 +453,7 @@ void ApplicationSolar::initializeOrbit() {
 
 // load models
 void ApplicationSolar::initializeGeometry() {
-  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD | model::TANGENT);
+  model planet_model = model_loader::obj(m_resource_path + "models/sphere.obj", model::NORMAL | model::TEXCOORD | model::TANGENT);
 
   model star_model = model{m_star_list, (model::POSITION + model::NORMAL), {1}};
 

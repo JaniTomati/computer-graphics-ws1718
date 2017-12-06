@@ -207,7 +207,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                            1, GL_FALSE, glm::value_ptr(model_matrix));
         glUniform1i(m_shaders.at("planet").u_locs.at("ColorTex"), 0);
-        glUniform1i(m_shaders.at("planet").u_locs.at("NormalTex"), 0);
+        glUniform1i(m_shaders.at("planet").u_locs.at("NormalTex"), 1);
         // extra matrix for normal transformation to keep them orthogonal to surface
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                            1, GL_FALSE, glm::value_ptr(normal_matrix));

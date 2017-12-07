@@ -190,9 +190,8 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
         model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * orbit.m_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
         model_matrix = glm::translate(model_matrix, glm::fvec3 {0.0f, 0.0f, -1.0f * orbit.m_distance_to_origin});
 
-        // self rotation
-        model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * orbit.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
-
+        // // self rotation
+        // model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * orbit.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
         // transform moon planet
         model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
         normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
@@ -212,11 +211,12 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
       }
     }
   } else if (planet_instance.m_planet_type == _sun){
+    // self rotation
+    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * planet_instance.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f}); //DFUQ
+
     // transform planet (where orbit planet is sun)
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
-
-    // self rotation
-    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * planet_instance.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
+    normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
 
     glUseProgram(m_shaders.at("sun").handle);
     glUniform1i(m_shaders.at("sun").u_locs.at("ShaderMode"), shader_Mode);
@@ -225,12 +225,15 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
     glUniform1i(m_shaders.at("sun").u_locs.at("ColorTex"), 0);
+    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                       1, GL_FALSE, glm::value_ptr(normal_matrix));
   } else {
+    // // self rotation
+    // model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * planet_instance.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
+
     model_matrix = calculatePlanetModelMatrix(model_matrix, planet_instance);
     normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
 
-    // self rotation
-    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * planet_instance.m_self_rotation_speed), glm::fvec3{0.0f, 1.0f, 0.0f});
 
     glUseProgram(m_shaders.at("planet").handle);
     glUniform1i(m_shaders.at("planet").u_locs.at("ShaderMode"), shader_Mode);
@@ -373,13 +376,13 @@ void ApplicationSolar::initializePlanets() {
   // initialize planets
   // name, size, rotation speed, self rotation speed, distance to origin, orbit origin, planet type, color, texture index
   planet sun {"sun", 300.0f, 0.0f, 10.0f, 0.0f, "sun", _sun, glm::vec3 {1.0, 1.0, 0}, 0, 0};
-  planet earth {"earth", 12.756f, 365.2f, 23.9f, 1496.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1, 0};
-  planet mercury {"mercury", 4.879f, 88.0f, 140.76f, 579.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2, 0};
-  planet venus {"venus", 12.104f, 224.7f, -583.25f, 1082.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3, 0};
-  planet mars {"mars", 6.792f, 687.0f, 24.6f, 227.90f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4, 0};
-  planet jupiter {"jupiter", 142.984f, 4331.0f, 9.9f, 7786.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5, 0};
-  planet saturn {"saturn", 120.536f, 10747.0f, 10.7f, 14335.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6, 0};
-  planet uranus {"uranus", 51.118f, 30589.0f, -17.2f, 28725.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7, 0};
+  planet earth {"earth", 12.756f, 365.2f, 23.9f, 1796.00f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 1, 0};
+  planet mercury {"mercury", 4.879f, 88.0f, 140.76f, 879.00f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.5}, 2, 0};
+  planet venus {"venus", 12.104f, 224.7f, -583.25f, 1382.00f, "sun", _planet, glm::vec3 {0.7, 0.5, 0.1}, 3, 0};
+  planet mars {"mars", 6.792f, 687.0f, 24.6f, 527.90f, "sun", _planet, glm::vec3 {0.5, 0.5, 0.2}, 4, 0};
+  planet jupiter {"jupiter", 142.984f, 4331.0f, 9.9f, 8086.0f, "sun", _planet, glm::vec3 {0.4, 0.4, 0.4}, 5, 0};
+  planet saturn {"saturn", 120.536f, 10747.0f, 10.7f, 14635.0f, "sun", _planet, glm::vec3 {0.9, 0.8, 0.4}, 6, 0};
+  planet uranus {"uranus", 51.118f, 30589.0f, -17.2f, 29025.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 7, 0};
   planet neptune {"neptune", 49.528f, 59.0f, 16.1f, 44951.0f, "sun", _planet, glm::vec3 {0.0, 0.0, 1.0}, 8, 0};
   planet pluto {"pluto", 2.370f, 90560.0f, -153.3f, 59064.0f, "sun", _planet, glm::vec3 {0.0, 1.0, 0.0}, 9, 0};
   planet moon {"moon", 3.475f, 27.3f*100.0f, 655.7f, 38.40f, "earth", _moon, glm::vec3 {0.0, 1.0, 1.0}, 10, 0};
@@ -419,6 +422,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("sun").u_locs["ModelMatrix"] = -1;
   m_shaders.at("sun").u_locs["ViewMatrix"] = -1;
   m_shaders.at("sun").u_locs["ProjectionMatrix"] = -1;
+  m_shaders.at("sun").u_locs["NormalMatrix"] = -1;
   m_shaders.at("sun").u_locs["ColorVector"] = -1;
   m_shaders.at("sun").u_locs["ShaderMode"] = -1;
   m_shaders.at("sun").u_locs["ColorTex"] = -1;

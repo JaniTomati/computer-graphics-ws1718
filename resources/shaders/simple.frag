@@ -64,9 +64,15 @@ void main() {
 
   // Cell-Shading-Model
   if (shader_Mode == 2) {
-    float normal_View_Angle = dot(-normalize(vertex_Position), normal);
 
+    float normal_View_Angle = dot(-normalize(vertex_Position), normalize(pass_Normal));
+
+    diffuse_Color = planet_Color;
+    ambient_Color = vec3(0.01, 0.01, 0.01);
+
+    specular_Angle = max(dot(H, normalize(pass_Normal)), 0.0);
     specular = pow(specular_Angle, shininess * 10);
+    lambertian = max(dot(L, normalize(pass_Normal)), 0.0);
 
     if(lambertian > 0.9) {lambertian = 1;}
     else if(lambertian > 0.6) {lambertian = 0.9;}
@@ -78,7 +84,7 @@ void main() {
       color_Linear = vec3(1.0, 0.0, 0.0);
     } else {
       // calculate planet color
-      color_Linear = ambient_Color + lambertian * diffuse_Color * vec3(planet_Color).xyz + specular * specular_Color;
+      color_Linear = ambient_Color + lambertian * diffuse_Color + specular * specular_Color;
     }
   }
 

@@ -1,7 +1,7 @@
 #version 150
 
-in vec3 pass_Normal_View;
-in vec3 vertex_Position_World;
+in vec3 pass_Normal;
+in vec3 vertex_Position;
 in vec3 sun_Color;
 in vec2 texture_Coordinates;
 
@@ -13,9 +13,9 @@ out vec4 out_Color;
 void main() {
   // Cell Shading Model
   if (shader_Mode == 2) {
-    vec3 NV = normalize(pass_Normal_View); // normal view
+    vec3 NV = normalize(pass_Normal); // normal view
     vec3 color_Linear;
-    float normal_View_Angle = dot(-normalize(vertex_Position_World), NV);
+    float normal_View_Angle = dot(-normalize(vertex_Position), NV);
 
     // highlight suns border in a different color
     if(abs(normal_View_Angle) < 0.1) {

@@ -41,6 +41,8 @@ class ApplicationSolar : public Application {
   void initializePlanets();
   void initializeShaderPrograms();
   void initializeGeometry();
+  void initializeFramebuffer();
+  void initializeScreenQuad();
   void initializeTextures();
   void initializeSkybox();
   void updateView();
@@ -69,6 +71,8 @@ class ApplicationSolar : public Application {
   // buffer objects
   renderbuffer_object rb_object;
   framebuffer_object fb_object;
+
+  texture_object quad_tex_object;
 
   // quad object
   model_object quad_object;

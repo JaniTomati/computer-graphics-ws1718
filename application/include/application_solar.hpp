@@ -67,8 +67,14 @@ class ApplicationSolar : public Application {
   texture_object m_texture_objects_skybox;
 
   // buffer objects
-  renderbuffer_object rb_handle;
-  framebuffer_object fbo_handle;
+  renderbuffer_object rb_object;
+  framebuffer_object fb_object;
+
+  // quad object
+  model_object quad_object;
+
+  GLenum draw_buffers[1];
+  GLenum status;
 
   int shader_Mode = 1;
 };

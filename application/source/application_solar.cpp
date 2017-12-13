@@ -47,12 +47,17 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 
 void ApplicationSolar::render() const {
 
+  glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
+  glEnable(GL_DEPTH_TEST);
+
   glDepthMask(GL_FALSE);
   glUseProgram(m_shaders.at("skybox").handle);
   glActiveTexture(GL_TEXTURE0);
   // bind Texture Object to 2d texture binding point of unit
   glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture_objects_skybox.handle);
   glBindVertexArray(skybox_object.vertex_AO);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glDrawElements(skybox_object.draw_mode, skybox_object.num_elements, model::INDEX.type, NULL);
   glDepthMask(GL_TRUE);
 
@@ -73,6 +78,9 @@ void ApplicationSolar::render() const {
     glUseProgram(m_shaders.at("orbit").handle);
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
+    glEnable(GL_DEPTH_TEST);
+
     // activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // bind Texture Object to 2d texture binding point of unit
@@ -82,6 +90,9 @@ void ApplicationSolar::render() const {
     uploadPlanetTransforms(planet);
     // bind the VAO to draw
     glBindVertexArray(planet_object.vertex_AO);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
   }
@@ -554,16 +565,17 @@ void ApplicationSolar::initializeTextures() {
   loadTextures();
 
   // 1. generate Renderbuffer Object
-  glGenRenderbuffers(1, &rb_handle);
+  glGenRenderbuffers(1, &rb_object.handle);
   // 2. bind RBO for formatting
-  glBindRenderbuffer(GL_RENDERBUFFER, rb_handle);
+  glBindRenderbuffer(GL_RENDERBUFFER, rb_object.handle);
   // 3. specify RBO properties
-  glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1920, 1080);
 
   // 1. generate Frame Buffer Object
-  glGenFramebuffers(1, &fbo_handle);
+  glGenFramebuffers(1, &fb_object.handle);
   // 2. bind FBO for configuration
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
+  glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
+
 
   int num_planets = m_planet_list.size();
 
@@ -587,6 +599,14 @@ void ApplicationSolar::initializeTextures() {
                  m_loaded_textures[i].channels, m_loaded_textures[i].channel_type, m_loaded_textures[i].ptr());
 
     m_texture_objects.push_back(tex_object);
+  }
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex_object.handle, 0);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb_object.handle);
+
+  draw_buffers[0] = {GL_COLOR_ATTACHMENT0};
+  status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if(status != GL_FRAMEBUFFER_COMPLETE) {
+    std::cout << "FRAMEBUFFER not Complete" << std::endl;
   }
 
   int num_normal_mappings = m_loaded_normal_mappings.size();
@@ -679,7 +699,7 @@ void ApplicationSolar::initializeSkybox() {
 
 }
 
-// deconstruct everything
+// deconstruct everything ---------------------------------------------- muss noch vervollständigt werden (JANA!)
 ApplicationSolar::~ApplicationSolar() {
   glDeleteBuffers(1, &planet_object.vertex_BO);
   glDeleteBuffers(1, &planet_object.element_BO);

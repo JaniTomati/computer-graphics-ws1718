@@ -66,6 +66,10 @@ class ApplicationSolar : public Application {
   std::vector<texture_object> m_texture_objects;
   texture_object m_texture_objects_skybox;
 
+  // buffer objects
+  renderbuffer_object rb_handle;
+  framebuffer_object fbo_handle;
+
   int shader_Mode = 1;
 };
 

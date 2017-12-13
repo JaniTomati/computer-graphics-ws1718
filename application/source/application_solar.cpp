@@ -553,6 +553,18 @@ void ApplicationSolar::initializeTextures() {
   // load textures using texture loader
   loadTextures();
 
+  // 1. generate Renderbuffer Object
+  glGenRenderbuffers(1, &rb_handle);
+  // 2. bind RBO for formatting
+  glBindRenderbuffer(GL_RENDERBUFFER, rb_handle);
+  // 3. specify RBO properties
+  glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
+
+  // 1. generate Frame Buffer Object
+  glGenFramebuffers(1, &fbo_handle);
+  // 2. bind FBO for configuration
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
+
   int num_planets = m_planet_list.size();
 
   // Texture specification

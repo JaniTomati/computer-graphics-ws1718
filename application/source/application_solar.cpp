@@ -311,29 +311,50 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
     updateView();
   }
 
-  else if (key == GLFW_KEY_2) {
-    shader_Mode = 2;
-    updateView();
+  else if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+    if(shader_Mode == 2) {
+      shader_Mode = 1;
+      updateView();
+    } else {
+      shader_Mode = 2;
+      updateView();
+    }
   }
-
-  else if (key == GLFW_KEY_7) {
-    shader_Mode = 7;
-    updateView();
+  else if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
+    if(shader_Mode == 7) {
+      shader_Mode = 1;
+      updateView();
+    } else {
+      shader_Mode = 7;
+      updateView();
+    }
   }
-
-  else if (key == GLFW_KEY_8) {
-    shader_Mode = 8;
-    updateView();
+  else if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
+    if(shader_Mode == 8) {
+      shader_Mode = 1;
+      updateView();
+    } else {
+      shader_Mode = 8;
+      updateView();
+    }
   }
-
-  else if (key == GLFW_KEY_9) {
-    shader_Mode = 9;
-    updateView();
+  else if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
+    if(shader_Mode == 9) {
+      shader_Mode = 1;
+      updateView();
+    } else {
+      shader_Mode = 9;
+      updateView();
+    }
   }
-
-  else if (key == GLFW_KEY_0) {
-    shader_Mode = 0;
-    updateView();
+  else if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
+    if(shader_Mode == 0) {
+      shader_Mode = 1;
+      updateView();
+    } else {
+      shader_Mode = 0;
+      updateView();
+    }
   }
 }
 

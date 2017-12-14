@@ -40,7 +40,6 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,fb_object{}
  ,quad_tex_object{}
  ,quad_object{}
- ,shader_Mode{}
 {
   initializePlanets();
   initializeStars(10000);
@@ -104,6 +103,7 @@ void ApplicationSolar::render() const {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, fb_tex_object.handle);
   glUniform1i(m_shaders.at("quad").u_locs.at("FramebufferTex"), 0);
+  glUniform1i(m_shaders.at("quad").u_locs.at("ShaderMode"), shader_Mode);
   glBindVertexArray(quad_object.vertex_AO);
   glDrawArrays(quad_object.draw_mode, 0, quad_object.num_elements);
 }
@@ -315,6 +315,26 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
     shader_Mode = 2;
     updateView();
   }
+
+  else if (key == GLFW_KEY_7) {
+    shader_Mode = 7;
+    updateView();
+  }
+
+  else if (key == GLFW_KEY_8) {
+    shader_Mode = 8;
+    updateView();
+  }
+
+  else if (key == GLFW_KEY_9) {
+    shader_Mode = 9;
+    updateView();
+  }
+
+  else if (key == GLFW_KEY_0) {
+    shader_Mode = 0;
+    updateView();
+  }
 }
 
 // handle delta mouse movement input
@@ -419,6 +439,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.emplace("quad", shader_program{m_resource_path + "shaders/quad.vert",
                                            m_resource_path + "shaders/quad.frag"});
   m_shaders.at("quad").u_locs["FramebufferTex"] = -1;
+  m_shaders.at("quad").u_locs["ShaderMode"] = -1;
 
   m_shaders.emplace("skybox", shader_program{m_resource_path + "shaders/skybox.vert",
                                            m_resource_path + "shaders/skybox.frag"});

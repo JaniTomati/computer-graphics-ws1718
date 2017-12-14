@@ -579,7 +579,7 @@ void ApplicationSolar::initializeFramebuffer() {
   // 2. bind RBO for formatting
   glBindRenderbuffer(GL_RENDERBUFFER, rb_object.handle);
   // 3. specify RBO properties
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1920, 1080);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1024, 768);
 
   // 1. generate Frame Buffer Object
   glGenFramebuffers(1, &fb_object.handle);
@@ -589,7 +589,7 @@ void ApplicationSolar::initializeFramebuffer() {
   glActiveTexture(GL_TEXTURE0);
   glGenTextures(1, &fb_tex_object.handle);
   glBindTexture(GL_TEXTURE_2D, fb_tex_object.handle);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 

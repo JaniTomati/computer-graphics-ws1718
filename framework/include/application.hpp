@@ -33,7 +33,7 @@ class Application {
  protected:
   void updateUniformLocations();
 
-  std::string m_resource_path; 
+  std::string m_resource_path;
 
   glm::fmat4 m_view_transform;
   glm::fmat4 m_view_projection;

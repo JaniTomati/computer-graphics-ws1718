@@ -590,16 +590,22 @@ void ApplicationSolar::initializeFramebuffer() {
   // 2. bind FBO for configuration
   glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
 
-  glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, 1920, 1080, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+  // 3. specify Texture Object attachments
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex_object.handle, 0);
+  // 4. specify Renderbuffer Object attachments
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb_object.handle);
 
+  // 5. create array containing enums representing color attachments
   draw_buffers[0] = {GL_COLOR_ATTACHMENT0};
+  // 6. set these color attachments to receive fragments
   glDrawBuffers(1, draw_buffers);
+  // 7. get the FBO status
   status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  // 8. compare return value with the valid status value
   if(status != GL_FRAMEBUFFER_COMPLETE) {
     std::cout << "FRAMEBUFFER not Complete" << std::endl;
   }

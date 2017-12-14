@@ -66,7 +66,6 @@ void ApplicationSolar::render() const {
   glBindTexture(GL_TEXTURE_CUBE_MAP, m_texture_objects_skybox.handle);
   glBindVertexArray(skybox_object.vertex_AO);
 
-  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glDrawElements(skybox_object.draw_mode, skybox_object.num_elements, model::INDEX.type, NULL);
   glDepthMask(GL_TRUE);
 
@@ -103,7 +102,7 @@ void ApplicationSolar::render() const {
 
   glUseProgram(m_shaders.at("quad").handle);
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, quad_tex_object.handle);
+  glBindTexture(GL_TEXTURE_2D, fb_tex_object.handle);
   glUniform1i(m_shaders.at("quad").u_locs.at("FramebufferTex"), 0);
   glBindVertexArray(quad_object.vertex_AO);
   glDrawArrays(quad_object.draw_mode, 0, quad_object.num_elements);

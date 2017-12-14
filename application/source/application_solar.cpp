@@ -30,11 +30,17 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,m_orbit_list{}
  ,tex_object{}
  ,m_loaded_textures{}
- ,shader_Mode{}
- ,m_texture_objects{}
- ,m_texture_objects_skybox{}
+ ,tex_object_normal{}
+ ,m_loaded_normal_mappings{}
  ,skybox_object{}
  ,skybox_coordinates{}
+ ,m_texture_objects{}
+ ,m_texture_objects_skybox{}
+ ,rb_object{}
+ ,fb_object{}
+ ,quad_tex_object{}
+ ,quad_object{}
+ ,shader_Mode{}
 {
   initializePlanets();
   initializeStars(10000);
@@ -50,11 +56,11 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 void ApplicationSolar::render() const {
 
   glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
-  glEnable(GL_DEPTH_TEST);
 
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClearDepth(1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
 
   glDepthMask(GL_FALSE);
   glUseProgram(m_shaders.at("skybox").handle);
@@ -583,19 +589,19 @@ void ApplicationSolar::initializeFramebuffer() {
   // 2. bind RBO for formatting
   glBindRenderbuffer(GL_RENDERBUFFER, rb_object.handle);
   // 3. specify RBO properties
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1920, 1080);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1920, 1080);
 
   // 1. generate Frame Buffer Object
   glGenFramebuffers(1, &fb_object.handle);
   // 2. bind FBO for configuration
   glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   // 3. specify Texture Object attachments
-  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex_object.handle, 0);
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fb_tex_object.handle, 0);
   // 4. specify Renderbuffer Object attachments
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rb_object.handle);
 
@@ -627,6 +633,7 @@ void ApplicationSolar::initializeScreenQuad() {
   glEnableVertexAttribArray(0);
   // first attribute is 3 floats with no offset & stride
   glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, quad_model.vertex_bytes, quad_model.offsets[model::POSITION]);
+
   quad_object.draw_mode = GL_TRIANGLES;
   quad_object.num_elements = GLsizei(quad_model.data.size());
 
@@ -637,10 +644,10 @@ void ApplicationSolar::initializeTextures() {
   // load textures using texture loader
   loadTextures();
 
-  int num_planets = m_planet_list.size();
+  auto num_planets = m_planet_list.size();
 
   // Texture specification
-  for (int i = 0; i < num_planets; ++i) {
+  for (unsigned int i = 0; i < num_planets; ++i) {
     // 1. activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // 2. generate texture object
@@ -661,10 +668,10 @@ void ApplicationSolar::initializeTextures() {
     m_texture_objects.push_back(tex_object);
   }
 
-  int num_normal_mappings = m_loaded_normal_mappings.size();
+  auto num_normal_mappings = m_loaded_normal_mappings.size();
 
   // Normal mapping specification
-  for (int i = 0; i < num_normal_mappings; ++i) {
+  for (unsigned int i = 0; i < num_normal_mappings; ++i) {
     // 1. activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0 + 1);
     // 2. generate texture object

@@ -56,9 +56,6 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
 void ApplicationSolar::render() const {
 
   glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
-
-  glClearColor(0.0, 0.0, 0.0, 0.0);
-  glClearDepth(1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
 
@@ -90,25 +87,19 @@ void ApplicationSolar::render() const {
     glUseProgram(m_shaders.at("orbit").handle);
     glDrawArrays(orbit_object.draw_mode, 0, orbit_object.num_elements);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
-    glEnable(GL_DEPTH_TEST);
-
     // activate Texture Unit to which to bind texture
     glActiveTexture(GL_TEXTURE0);
     // bind Texture Object to 2d texture binding point of unit
     glBindTexture(GL_TEXTURE_2D, m_texture_objects[planet.m_texture_index].handle);
-
     // calculates model- and normal-matrix
     uploadPlanetTransforms(planet);
     // bind the VAO to draw
     glBindVertexArray(planet_object.vertex_AO);
-
     // draw bound vertex array using bound shader
     glDrawElements(planet_object.draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
   }
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glUseProgram(m_shaders.at("quad").handle);
   glActiveTexture(GL_TEXTURE0);
@@ -596,6 +587,9 @@ void ApplicationSolar::initializeFramebuffer() {
   // 2. bind FBO for configuration
   glBindFramebuffer(GL_FRAMEBUFFER, fb_object.handle);
 
+  glActiveTexture(GL_TEXTURE0);
+  glGenTextures(1, &fb_tex_object.handle);
+  glBindTexture(GL_TEXTURE_2D, fb_tex_object.handle);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -618,7 +612,7 @@ void ApplicationSolar::initializeFramebuffer() {
 }
 
 void ApplicationSolar::initializeScreenQuad() {
-  model quad_model = model_loader::obj(m_resource_path + "models/quad.obj", model::NORMAL);
+  model quad_model = model_loader::obj(m_resource_path + "models/quad.obj", model::TEXCOORD);
 
   glGenVertexArrays(1, &quad_object.vertex_AO);
   // bind the array for attaching buffers
@@ -634,8 +628,12 @@ void ApplicationSolar::initializeScreenQuad() {
   // first attribute is 3 floats with no offset & stride
   glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, quad_model.vertex_bytes, quad_model.offsets[model::POSITION]);
 
-  quad_object.draw_mode = GL_TRIANGLES;
-  quad_object.num_elements = GLsizei(quad_model.data.size());
+  glEnableVertexAttribArray(1);
+  // first attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::TEXCOORD.components, model::TEXCOORD.type, GL_FALSE, quad_model.vertex_bytes, quad_model.offsets[model::TEXCOORD]);
+
+  quad_object.draw_mode = GL_TRIANGLE_STRIP;
+  quad_object.num_elements = GLsizei(quad_model.indices.size());
 
   glBindVertexArray(0);
 }
@@ -662,7 +660,7 @@ void ApplicationSolar::initializeTextures() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // 6. format Texture Object bound to the 2d binding point
-    glTexImage2D(GL_TEXTURE_2D, 0, m_loaded_textures[i].channels, m_loaded_textures[i].width, m_loaded_textures[i].height, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, m_loaded_textures[i].channels, GLsizei(m_loaded_textures[i].width), GLsizei(m_loaded_textures[i].height), 0,
                  m_loaded_textures[i].channels, m_loaded_textures[i].channel_type, m_loaded_textures[i].ptr());
 
     m_texture_objects.push_back(tex_object);
@@ -686,7 +684,7 @@ void ApplicationSolar::initializeTextures() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     // 6. format Texture Object bound to the 2d binding point
-    glTexImage2D(GL_TEXTURE_2D, 0, m_loaded_normal_mappings[i].channels,  m_loaded_normal_mappings[i].width,  m_loaded_normal_mappings[i].height, 0,
+    glTexImage2D(GL_TEXTURE_2D, 0, m_loaded_normal_mappings[i].channels,  GLsizei(m_loaded_normal_mappings[i].width),  GLsizei(m_loaded_normal_mappings[i].height), 0,
                   m_loaded_normal_mappings[i].channels,  m_loaded_normal_mappings[i].channel_type,  m_loaded_normal_mappings[i].ptr());
 
     m_texture_objects.push_back(tex_object_normal);
@@ -710,17 +708,17 @@ void ApplicationSolar::initializeTextures() {
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
 
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, m_loaded_textures[num_planets].channels, m_loaded_textures[num_planets].width, m_loaded_textures[num_planets].height, 0,
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, m_loaded_textures[num_planets].channels, GLsizei(m_loaded_textures[num_planets].width), GLsizei(m_loaded_textures[num_planets].height), 0,
     m_loaded_textures[num_planets].channels, m_loaded_textures[num_planets].channel_type, m_loaded_textures[num_planets].ptr());
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, m_loaded_textures[num_planets + 1].channels, m_loaded_textures[num_planets + 1].width, m_loaded_textures[num_planets + 1].height, 0,
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, m_loaded_textures[num_planets + 1].channels, GLsizei(m_loaded_textures[num_planets + 1].width), GLsizei(m_loaded_textures[num_planets + 1].height), 0,
     m_loaded_textures[num_planets + 1].channels, m_loaded_textures[num_planets + 1].channel_type, m_loaded_textures[num_planets + 1].ptr());
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, m_loaded_textures[num_planets + 2].channels, m_loaded_textures[num_planets + 2].width, m_loaded_textures[num_planets + 2].height, 0,
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, m_loaded_textures[num_planets + 2].channels, GLsizei(m_loaded_textures[num_planets + 2].width), GLsizei(m_loaded_textures[num_planets + 2].height), 0,
     m_loaded_textures[num_planets + 2].channels, m_loaded_textures[num_planets + 2].channel_type, m_loaded_textures[num_planets + 2].ptr());
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, m_loaded_textures[num_planets + 3].channels, m_loaded_textures[num_planets + 3].width, m_loaded_textures[num_planets + 3].height, 0,
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, m_loaded_textures[num_planets + 3].channels, GLsizei(m_loaded_textures[num_planets + 3].width), GLsizei(m_loaded_textures[num_planets + 3].height), 0,
     m_loaded_textures[num_planets + 3].channels, m_loaded_textures[num_planets + 3].channel_type, m_loaded_textures[num_planets + 3].ptr());
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, m_loaded_textures[num_planets + 4].channels, m_loaded_textures[num_planets + 4].width, m_loaded_textures[num_planets + 4].height, 0,
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, m_loaded_textures[num_planets + 4].channels, GLsizei(m_loaded_textures[num_planets + 4].width), GLsizei(m_loaded_textures[num_planets + 4].height), 0,
     m_loaded_textures[num_planets + 4].channels, m_loaded_textures[num_planets + 4].channel_type, m_loaded_textures[num_planets + 4].ptr());
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, m_loaded_textures[num_planets + 5].channels, m_loaded_textures[num_planets + 5].width, m_loaded_textures[num_planets + 5].height, 0,
+  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, m_loaded_textures[num_planets + 5].channels, GLsizei(m_loaded_textures[num_planets + 5].width), GLsizei(m_loaded_textures[num_planets + 5].height), 0,
     m_loaded_textures[num_planets + 5].channels, m_loaded_textures[num_planets + 5].channel_type, m_loaded_textures[num_planets + 5].ptr());
 }
 

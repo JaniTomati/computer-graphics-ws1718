@@ -103,7 +103,11 @@ void ApplicationSolar::render() const {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, fb_tex_object.handle);
   glUniform1i(m_shaders.at("quad").u_locs.at("FramebufferTex"), 0);
-  glUniform1i(m_shaders.at("quad").u_locs.at("ShaderMode"), shader_Mode);
+  glUniform1i(m_shaders.at("quad").u_locs.at("HorizontalReflectionMode"), horizontal_Mode);
+  glUniform1i(m_shaders.at("quad").u_locs.at("GreyScaleMode"), greyscale_Mode);
+  glUniform1i(m_shaders.at("quad").u_locs.at("VerticalReflectionMode"), vertical_Mode);
+  glUniform1i(m_shaders.at("quad").u_locs.at("BlurMode"), blur_Mode);
+  // glUniform1i(m_shaders.at("quad").u_locs.at("ShaderMode"), shader_Mode);
   glBindVertexArray(quad_object.vertex_AO);
   glDrawArrays(quad_object.draw_mode, 0, quad_object.num_elements);
 }
@@ -278,84 +282,68 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
   // move forwards
   if ((key == GLFW_KEY_W || key == GLFW_KEY_UP) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
-    updateView();
   }
   // move backwards
   else if ((key == GLFW_KEY_S || key == GLFW_KEY_DOWN) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
-    updateView();
   }
   // move to the left
   else if ((key == GLFW_KEY_A || key == GLFW_KEY_LEFT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
-    updateView();
   }
   // move to the right
   else if ((key == GLFW_KEY_D || key == GLFW_KEY_RIGHT) && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.1f, 0.0f, 0.0f});
-    updateView();
   }
   // move upwards
   else if (key == GLFW_KEY_SPACE && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.1f, 0.0f});
-    updateView();
   }
   // move downwards
   else if (key == GLFW_KEY_C && (action == GLFW_PRESS || GLFW_REPEAT)) {
     m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, -0.1f, 0.0f});
-    updateView();
   }
 
   else if (key == GLFW_KEY_1) {
     shader_Mode = 1;
-    updateView();
   }
 
   else if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
     if(shader_Mode == 2) {
       shader_Mode = 1;
-      updateView();
     } else {
       shader_Mode = 2;
-      updateView();
     }
   }
   else if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
-    if(shader_Mode == 7) {
-      shader_Mode = 1;
-      updateView();
+    if(greyscale_Mode) {
+      greyscale_Mode = false;
     } else {
-      shader_Mode = 7;
-      updateView();
+      greyscale_Mode = true;
     }
   }
   else if (key == GLFW_KEY_8 && action == GLFW_PRESS) {
-    if(shader_Mode == 8) {
-      shader_Mode = 1;
-      updateView();
+    if(horizontal_Mode) {
+      horizontal_Mode = false;
     } else {
-      shader_Mode = 8;
-      updateView();
+      horizontal_Mode = true;
     }
   }
   else if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
-    if(shader_Mode == 9) {
-      shader_Mode = 1;
-      updateView();
+    if(vertical_Mode) {
+      vertical_Mode = false;
     } else {
-      shader_Mode = 9;
-      updateView();
+      vertical_Mode = true;
     }
   }
   else if (key == GLFW_KEY_0 && action == GLFW_PRESS) {
-    if(shader_Mode == 0) {
-      shader_Mode = 1;
-      updateView();
+    if(blur_Mode) {
+      blur_Mode = false;
     } else {
-      shader_Mode = 0;
-      updateView();
+      blur_Mode = true;
     }
   }
+  updateView();
 }
 
 // handle delta mouse movement input
@@ -460,7 +448,11 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.emplace("quad", shader_program{m_resource_path + "shaders/quad.vert",
                                            m_resource_path + "shaders/quad.frag"});
   m_shaders.at("quad").u_locs["FramebufferTex"] = -1;
-  m_shaders.at("quad").u_locs["ShaderMode"] = -1;
+  m_shaders.at("quad").u_locs["HorizontalReflectionMode"] = -1;
+  m_shaders.at("quad").u_locs["GreyScaleMode"] = -1;
+  m_shaders.at("quad").u_locs["VerticalReflectionMode"] = -1;
+  m_shaders.at("quad").u_locs["BlurMode"] = -1;
+  // m_shaders.at("quad").u_locs["ShaderMode"] = -1;
 
   m_shaders.emplace("skybox", shader_program{m_resource_path + "shaders/skybox.vert",
                                            m_resource_path + "shaders/skybox.frag"});

@@ -82,6 +82,11 @@ class ApplicationSolar : public Application {
   GLenum status;
 
   int shader_Mode = 1;
+  bool greyscale_Mode = false;
+  bool horizontal_Mode = false;
+  bool vertical_Mode = false;
+  bool blur_Mode = false;
+
 };
 
 #endif

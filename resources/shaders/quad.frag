@@ -1,9 +1,14 @@
 #version 150
 
 in vec2 texture_Coordinates;
-flat in int shader_Mode;
+// flat in int shader_Mode;
 
 uniform sampler2D FramebufferTex;
+
+uniform bool HorizontalReflectionMode;
+uniform bool GreyScaleMode;
+uniform bool VerticalReflectionMode;
+uniform bool BlurMode;
 
 out vec4 out_Color;
 
@@ -14,19 +19,17 @@ void main() {
 
   out_Color = texture(FramebufferTex, texture_Coordinates);
 
-  if(shader_Mode == 7) {
-    // greyscale
-    float avg = 0.2126 * out_Color.r + 0.7152 * out_Color.g + 0.0722 * out_Color.b;
-    out_Color = vec4(avg, avg, avg, 1.0);
-  }else if (shader_Mode == 8) {
+  if (HorizontalReflectionMode) {
     // horizontal
 		tex_y = 1 - tex_y;
 		out_Color = texture(FramebufferTex, vec2(tex_x, tex_y));
-  }else if (shader_Mode == 9) {
+  }
+  if (VerticalReflectionMode) {
     // vertical
     tex_x = 1 - tex_x;
 		out_Color = texture(FramebufferTex, vec2(tex_x, tex_y));
-  }else if (shader_Mode == 0) {
+  }
+  if (BlurMode) {
     // blur
     const float blur_x = 1.0 / 500.0;
     const float blur_y = 1.0 / 500.0;
@@ -38,7 +41,10 @@ void main() {
           out_Color = sum;
         }
       }
-  } else {
-    out_Color = texture(FramebufferTex, texture_Coordinates);
+  }
+  if(GreyScaleMode) {
+    // greyscale
+    float avg = 0.2126 * out_Color.r + 0.7152 * out_Color.g + 0.0722 * out_Color.b;
+    out_Color = vec4(avg, avg, avg, 1.0);
   }
 }

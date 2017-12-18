@@ -10,6 +10,8 @@ uniform bool GreyScaleMode;
 uniform bool VerticalReflectionMode;
 uniform bool BlurMode;
 
+in vec4 gl_FragCoord;
+
 out vec4 out_Color;
 
 void main() {
@@ -31,16 +33,24 @@ void main() {
   }
   if (BlurMode) {
     // blur
-    const float blur_x = 1.0 / 500.0;
-    const float blur_y = 1.0 / 500.0;
+    tex_x = tex_x / gl_FragCoord.x;
+    tex_y = tex_y / gl_FragCoord.y;
     vec4 sum = vec4(0.0);
-    for (int x = -3; x <= 3; x++) {
-      for (int y = -3; y <= 3; y++) {
-        sum += texture(FramebufferTex, vec2(tex_x + x * blur_x,
-          tex_y + y * blur_y)) / 81.0;
-          out_Color = sum;
+    vec2 temp = vec2(0.0);
+    for (int x = -1; x <= 1; x++) {
+      for (int y = -1; y <= 1; y++) {
+        // Klammern entfernen für grosses Kino
+        temp = vec2(tex_x * (x + gl_FragCoord.x), tex_y * (y + gl_FragCoord.y));
+        if(x == 1 && y == 1) {
+          sum += texture(FramebufferTex, temp) * 	0.195346;
+        } else if(mod(x, 2) == 0 || mod(y, 2) == 0) {
+          sum += texture(FramebufferTex, temp) * 	0.123317;
+        } else {
+          sum += texture(FramebufferTex, temp) * 	0.077847;
         }
       }
+    }
+    out_Color = sum;
   }
   if(GreyScaleMode) {
     // greyscale

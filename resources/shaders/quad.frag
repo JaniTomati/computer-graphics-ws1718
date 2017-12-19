@@ -33,14 +33,16 @@ void main() {
   }
   if (BlurMode) {
     // blur
-    tex_x = tex_x / gl_FragCoord.x;
-    tex_y = tex_y / gl_FragCoord.y;
+    float temp_x = 1.0 / 1024;
+    float temp_y = 1.0 / 768;
+    // float temp_x = 1.0 / gl_FragCoord.x;
+    // float temp_y = 1.0 / gl_FragCoord.y;
     vec4 sum = vec4(0.0);
     vec2 temp = vec2(0.0);
     for (int x = -1; x <= 1; x++) {
       for (int y = -1; y <= 1; y++) {
-        // Klammern entfernen für grosses Kino
-        temp = vec2(tex_x * (x + gl_FragCoord.x), tex_y * (y + gl_FragCoord.y));
+        // temp_x_y entfernen für grosses Kino (geht grade nicht -.-)
+        temp = vec2(tex_x + x * temp_x, tex_y + y * temp_y);
         if(x == 1 && y == 1) {
           sum += texture(FramebufferTex, temp) * 	0.195346;
         } else if(mod(x, 2) == 0 || mod(y, 2) == 0) {

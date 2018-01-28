@@ -45,7 +45,6 @@ class ApplicationSolar : public Application {
   void initializeScreenQuad();
   void initializeTextures();
   void initializeSkybox();
-  void initializeParticles(unsigned int number_particles);
   void updateView();
 
   model_object planet_object; // cpu representation of model
@@ -56,9 +55,6 @@ class ApplicationSolar : public Application {
 
   model_object orbit_object;
   std::vector<GLfloat> m_orbit_list;
-
-  model_object particle_object;
-  std::vector<particle> m_particle_list;
 
   texture_object tex_object;
   std::vector<pixel_data> m_loaded_textures;

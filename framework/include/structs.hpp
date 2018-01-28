@@ -4,6 +4,7 @@
 #include <map>
 #include <glbinding/gl/gl.h>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <string>
 
 // use gl definitions from glbinding
@@ -38,7 +39,7 @@ struct texture_object {
   GLenum target = GL_NONE;
 };
 
-// gpu representation of framebuffer 
+// gpu representation of framebuffer
 struct framebuffer_object {
   GLuint handle = 0;
 };
@@ -100,4 +101,22 @@ struct texture {
   std::string m_name;
   std::string m_file_path;
 };
+// Particle struct for point
+struct particle {
+  particle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec4 const& color,
+           float size, float angle, float life) :
+    m_pos {pos},
+    m_velocity {velocity},
+    m_color {color},
+    m_size {size},
+    m_angle {angle},
+    m_life {life} {}
+
+  glm::vec3 m_pos, m_velocity;
+  glm::vec4 m_color;
+  float m_size;
+  float m_angle;
+  float m_life;
+};
+
 #endif

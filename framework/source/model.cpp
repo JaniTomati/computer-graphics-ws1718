@@ -5,7 +5,7 @@
 #include <cstdint>
 
 std::vector<model::attribute> const model::VERTEX_ATTRIBS
- = {  
+ = {
     /*POSITION*/{ 1 << 0, sizeof(float), 3, GL_FLOAT},
     /*NORMAL*/{   1 << 1, sizeof(float), 3, GL_FLOAT},
     /*TEXCOORD*/{ 1 << 2, sizeof(float), 2, GL_FLOAT},
@@ -52,3 +52,28 @@ model::model(std::vector<GLfloat> const& databuff, attrib_flag_t contained_attri
   // set number of vertice sin buffer
   vertex_num = data.size() / component_num;
 }
+
+model::model(std::vector<particle> const& databuff, attrib_flag_t contained_attributes, std::vector<GLuint> const& trianglebuff)
+  :data{}
+  ,particle_data(databuff)
+  ,indices(trianglebuff)
+  ,offsets{}
+  ,vertex_bytes{0}
+  ,vertex_num{0} {
+    // number of components per vertex
+    std::size_t component_num = 0;
+
+    for (auto const& supported_attribute : model::VERTEX_ATTRIBS) {
+      // check if buffer contains attribute
+      if (supported_attribute.flag & contained_attributes) {
+        // write offset, explicit cast to prevent narrowing warning
+        offsets.insert(std::pair<attrib_flag_t, GLvoid*>{supported_attribute, (GLvoid*)uintptr_t(vertex_bytes)});
+        // move offset pointer forward
+        vertex_bytes += supported_attribute.size * supported_attribute.components;
+        // increase number of components
+        component_num += supported_attribute.components;
+      }
+    }
+    // set number of vertice sin buffer
+    vertex_num = data.size() / component_num;
+  }

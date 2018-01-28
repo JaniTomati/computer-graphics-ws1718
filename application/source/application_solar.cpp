@@ -28,6 +28,8 @@ ApplicationSolar::ApplicationSolar(std::string const& resource_path)
  ,m_star_list{}
  ,orbit_object{}
  ,m_orbit_list{}
+ ,particle_object{}
+ ,m_particle_list{}
  ,tex_object{}
  ,m_loaded_textures{}
  ,tex_object_normal{}
@@ -135,6 +137,12 @@ void ApplicationSolar::updateView() {
   glUseProgram(m_shaders.at("orbit").handle);
   glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ViewMatrix"),
                       1, GL_FALSE, glm::value_ptr(view_matrix));
+
+  glUseProgram(m_shaders.at("particle").handle);
+  glUniformMatrix4fv(m_shaders.at("particle").u_locs.at("ViewMatrix"),
+                      1, GL_FALSE, glm::value_ptr(view_matrix));
+
+
 }
 
 void ApplicationSolar::updateProjection() {
@@ -157,6 +165,10 @@ void ApplicationSolar::updateProjection() {
 
   glUseProgram(m_shaders.at("orbit").handle);
   glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ProjectionMatrix"),
+                      1, GL_FALSE, glm::value_ptr(m_view_projection));
+
+  glUseProgram(m_shaders.at("particle").handle);
+  glUniformMatrix4fv(m_shaders.at("particle").u_locs.at("ProjectionMatrix"),
                       1, GL_FALSE, glm::value_ptr(m_view_projection));
 }
 
@@ -507,6 +519,14 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("orbit").u_locs["ModelMatrix"] = -1;
   m_shaders.at("orbit").u_locs["ViewMatrix"] = -1;
   m_shaders.at("orbit").u_locs["ProjectionMatrix"] = -1;
+
+  // store particle shader program objects in container
+  m_shaders.emplace("particle", shader_program{m_resource_path + "shaders/particle.vert",
+                                        m_resource_path + "shaders/particle.frag"});
+  // request uniform locations for particle shader program
+  m_shaders.at("particle").u_locs["ModelMatrix"] = -1;
+  m_shaders.at("particle").u_locs["ViewMatrix"] = -1;
+  m_shaders.at("particle").u_locs["ProjectionMatrix"] = -1;
 }
 
 // fill m_star_list with random star values for given number of stars
@@ -532,6 +552,8 @@ void ApplicationSolar::initializeGeometry() {
   model star_model = model{m_star_list, (model::POSITION + model::NORMAL), {1}};
 
   model orbit_model = model{m_orbit_list, (model::POSITION), {1}};
+
+  model particle_model = model{m_particle_list, (model::POSITION + model::NORMAL), {1}};
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -611,6 +633,25 @@ void ApplicationSolar::initializeGeometry() {
 
   orbit_object.draw_mode = GL_LINE_LOOP;
   orbit_object.num_elements = GLsizei(orbit_model.data.size() / 3);
+
+  // generate everything for star_model as well
+  glGenVertexArrays(1, &particle_object.vertex_AO);
+  glBindVertexArray(particle_object.vertex_AO);
+
+  glGenBuffers(1, &particle_object.vertex_BO);
+  glBindBuffer(GL_ARRAY_BUFFER, particle_object.vertex_BO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * particle_model.data.size(), particle_model.data.data(), GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, particle_model.vertex_bytes, particle_model.offsets[model::POSITION]);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, particle_model.vertex_bytes, particle_model.offsets[model::NORMAL]);
+
+  glGenBuffers(1, &particle_object.element_BO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, particle_object.element_BO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * particle_model.indices.size(), particle_model.indices.data(), GL_STATIC_DRAW);
+  particle_object.draw_mode = GL_POINTS;
+  particle_object.num_elements = GLsizei(particle_model.data.size());
 
   glBindVertexArray(0);
 }
@@ -797,6 +838,19 @@ void ApplicationSolar::initializeSkybox() {
 
 }
 
+void ApplicationSolar::initializeParticles(unsigned int number_particles) {
+  for (unsigned i = 0; i < number_particles; ++i) {
+    glm::vec3 pos {0.0f + i, 0.1f, 1.0f};
+    glm::vec3 velocity {1.0f, 0.5f, 0.0f};
+    glm::vec4 color {static_cast<GLfloat> (rand() % (255 + 1)), static_cast<GLfloat> (rand() % (255 + 1)),
+      static_cast<GLfloat> (rand() % (255 + 1)), (static_cast<GLfloat> (rand() % (100 + 1))) / 100};
+    float size = 1.0f;
+    float angle = 0.0f;
+    float life = static_cast<GLfloat> (rand() % (1000 + 1));
+
+    m_particle_list.push_back(particle {pos, velocity, color, size, angle, life});
+  }
+}
 // deconstruct everything ---------------------------------------------- muss noch vervollständigt werden (JANA!)
 ApplicationSolar::~ApplicationSolar() {
   glDeleteBuffers(1, &planet_object.vertex_BO);

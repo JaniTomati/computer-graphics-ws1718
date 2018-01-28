@@ -26,7 +26,6 @@ void main() {
     }
     out_Color = vec4(color_Linear, 1.0);
 
-    // default: set plain sun color
   } else {
     //out_Color = vec4(vec3(sun_Color).xyz, 1.0);
     out_Color = texture(ColorTex, texture_Coordinates);

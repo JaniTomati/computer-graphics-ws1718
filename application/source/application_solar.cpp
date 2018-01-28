@@ -107,7 +107,7 @@ void ApplicationSolar::render() const {
   glUniform1i(m_shaders.at("quad").u_locs.at("GreyScaleMode"), greyscale_Mode);
   glUniform1i(m_shaders.at("quad").u_locs.at("VerticalReflectionMode"), vertical_Mode);
   glUniform1i(m_shaders.at("quad").u_locs.at("BlurMode"), blur_Mode);
-  // glUniform1i(m_shaders.at("quad").u_locs.at("ShaderMode"), shader_Mode);
+  glUniform1i(m_shaders.at("quad").u_locs.at("GodRays"), godray_Mode);
   glBindVertexArray(quad_object.vertex_AO);
   glDrawArrays(quad_object.draw_mode, 0, quad_object.num_elements);
 }
@@ -250,7 +250,7 @@ void ApplicationSolar::uploadPlanetTransforms(planet const& planet_instance) con
     glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("ModelMatrix"),
                        1, GL_FALSE, glm::value_ptr(model_matrix));
     glUniform1i(m_shaders.at("sun").u_locs.at("ColorTex"), 0);
-    glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+    glUniformMatrix4fv(m_shaders.at("sun").u_locs.at("NormalMatrix"),
                        1, GL_FALSE, glm::value_ptr(normal_matrix));
   } else {
     // // self rotation
@@ -341,6 +341,13 @@ void ApplicationSolar::keyCallback(int key, int scancode, int action, int mods) 
       blur_Mode = false;
     } else {
       blur_Mode = true;
+    }
+  }
+  else if (key == GLFW_KEY_6 && action == GLFW_PRESS) {
+    if(godray_Mode) {
+      godray_Mode = false;
+    } else {
+      godray_Mode = true;
     }
   }
   updateView();
@@ -452,7 +459,8 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("quad").u_locs["GreyScaleMode"] = -1;
   m_shaders.at("quad").u_locs["VerticalReflectionMode"] = -1;
   m_shaders.at("quad").u_locs["BlurMode"] = -1;
-  // m_shaders.at("quad").u_locs["ShaderMode"] = -1;
+  m_shaders.at("quad").u_locs["GodRays"] = -1;
+  m_shaders.at("quad").u_locs["LightTex"] = -1;
 
   m_shaders.emplace("skybox", shader_program{m_resource_path + "shaders/skybox.vert",
                                            m_resource_path + "shaders/skybox.frag"});

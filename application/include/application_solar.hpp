@@ -86,6 +86,7 @@ class ApplicationSolar : public Application {
   bool horizontal_Mode = false;
   bool vertical_Mode = false;
   bool blur_Mode = false;
+  bool godray_Mode = false;
 
 };
 

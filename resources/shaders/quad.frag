@@ -38,11 +38,11 @@ void main() {
    vec2 light_Pos = (LightCenter.xy + vec2(1.0, 1.0)) / 2;
    vec2 updated_tex_Coord = (tex_Coord - light_Pos) / num_Samples * density;
 
-   vec4 final_Light = texture2D(LightTex, tex_Coord);
+   vec4 final_Light = texture(LightTex, tex_Coord);
 
    for (int i = 0; i < num_Samples; ++i) {
      tex_Coord -= updated_tex_Coord;
-     vec4 sample_Light = texture2D(LightTex, tex_Coord);
+     vec4 sample_Light = texture(LightTex, tex_Coord);
      sample_Light *= illumination_Decay * weight;
      final_Light += sample_Light;
      illumination_Decay *= decay;

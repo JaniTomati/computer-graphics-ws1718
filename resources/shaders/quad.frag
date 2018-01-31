@@ -10,11 +10,12 @@ uniform bool GreyScaleMode;
 uniform bool VerticalReflectionMode;
 uniform bool BlurMode;
 uniform bool GodRays;
+uniform vec4 LightCenter;
+uniform sampler2D LightTex;
 
 in vec4 gl_FragCoord;
 
 out vec4 out_Color;
-uniform sampler2D LightTex;
 
 const float num_Samples = 200.0;
 
@@ -27,15 +28,14 @@ void main() {
   out_Color = texture(FramebufferTex, texture_Coordinates);
 
   if (GodRays) {
-    float exposure = 0.2;
-    float decay = 0.9;
-    float density = 0.926;
-    float weight = 0.55;
-    float illumination_Decay = 1.0;
+    float exposure = 0.75;
+    float decay = 0.97;
+    float density = 0.5;
+    float weight = 0.1;
+    float illumination_Decay = 0.5;
     vec2 tex_Coord = texture_Coordinates.xy;
 
-   // vec2 light_Pos = (light_Position.xy + vec2(1.0, 1.0)) / 2;
-   vec2 light_Pos = (vec2(0.0, 0.0) + vec2(1.0, 1.0)) / 2;
+   vec2 light_Pos = (LightCenter.xy + vec2(1.0, 1.0)) / 2;
    vec2 updated_tex_Coord = (tex_Coord - light_Pos) / num_Samples * density;
 
    vec4 final_Light = texture2D(LightTex, tex_Coord);

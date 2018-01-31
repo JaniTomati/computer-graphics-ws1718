@@ -108,6 +108,14 @@ void ApplicationSolar::render() const {
   glUniform1i(m_shaders.at("quad").u_locs.at("VerticalReflectionMode"), vertical_Mode);
   glUniform1i(m_shaders.at("quad").u_locs.at("BlurMode"), blur_Mode);
   glUniform1i(m_shaders.at("quad").u_locs.at("GodRays"), godray_Mode);
+
+  glm::fmat4 temp = projection_matrix_temp * view_matrix_temp * model_matrix_sun;
+  glm::fvec4 light_center = temp * glm::fvec4(0.0, 0.0, 0.0, 1.0);
+  light_center = light_center / light_center.w; //homogen normalization
+
+  glUniform4fv(m_shaders.at("quad").u_locs.at("LightCenter"),
+                      1, glm::value_ptr(light_center));
+
   glBindVertexArray(quad_object.vertex_AO);
   glDrawArrays(quad_object.draw_mode, 0, quad_object.num_elements);
 }
@@ -135,6 +143,8 @@ void ApplicationSolar::updateView() {
   glUseProgram(m_shaders.at("orbit").handle);
   glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ViewMatrix"),
                       1, GL_FALSE, glm::value_ptr(view_matrix));
+
+  view_matrix_temp = view_matrix;
 }
 
 void ApplicationSolar::updateProjection() {
@@ -158,6 +168,8 @@ void ApplicationSolar::updateProjection() {
   glUseProgram(m_shaders.at("orbit").handle);
   glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ProjectionMatrix"),
                       1, GL_FALSE, glm::value_ptr(m_view_projection));
+
+  projection_matrix_temp = m_view_projection;
 }
 
 // update uniform locations
@@ -185,6 +197,8 @@ void ApplicationSolar::calculateOrbit(planet const& planet_instance) const {
     glUseProgram(m_shaders.at("orbit").handle);
     glUniformMatrix4fv(m_shaders.at("orbit").u_locs.at("ModelMatrix"),
     1, GL_FALSE, glm::value_ptr(model_matrix));
+
+    model_matrix_sun = model_matrix;
   } else {
     // compute orbit for moving origin
     for (auto const& orbit_base : m_planet_list) {
@@ -461,6 +475,7 @@ void ApplicationSolar::initializeShaderPrograms() {
   m_shaders.at("quad").u_locs["BlurMode"] = -1;
   m_shaders.at("quad").u_locs["GodRays"] = -1;
   m_shaders.at("quad").u_locs["LightTex"] = -1;
+  m_shaders.at("quad").u_locs["LightCenter"] = -1;
 
   m_shaders.emplace("skybox", shader_program{m_resource_path + "shaders/skybox.vert",
                                            m_resource_path + "shaders/skybox.frag"});

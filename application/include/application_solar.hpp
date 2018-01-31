@@ -88,6 +88,10 @@ class ApplicationSolar : public Application {
   bool blur_Mode = false;
   bool godray_Mode = false;
 
+  mutable glm::fmat4 model_matrix_sun;
+  mutable glm::fmat4 projection_matrix_temp;
+  mutable glm::fmat4 view_matrix_temp;
+
 };
 
 #endif
